@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Namsan to Seongsu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: single mobile column; sticky tab bar (Schedule / Cost / Time / Distance); time rail on the schedule; ledger-style tables on the other tabs */
+:root{
+  --bg:#EEF0EE; --surface:#FFFFFF; --fg:#1D2524; --muted:#5D6866; --line:#D3D9D7;
+  --brick:#A8432E;   /* Seongsu red brick */
+  --celadon:#2E6A4C; /* Namsan pine */
+  --team-a:#3B5BA5; --team-b:#C2621A; --together:#6E4B9E;
+  --ochre:#B07A1C;   /* third category */
+  --slate:#5B6B8C;   /* fourth category */
+  --chip:#E3E8E6;
+  --display:"Do Hyeon","IBM Plex Sans KR",system-ui,sans-serif;
+  --body:"IBM Plex Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141A19; --surface:#1C2423; --fg:#E7ECEA; --muted:#9AA6A3; --line:#2E3836;
+  --brick:#E07A60; --celadon:#7CC29E; --team-a:#8AA6E8; --team-b:#F0A060; --together:#B79AE0; --ochre:#E0AE52; --slate:#93A3C6; --chip:#25302E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141A19; --surface:#1C2423; --fg:#E7ECEA; --muted:#9AA6A3; --line:#2E3836;
+  --brick:#E07A60; --celadon:#7CC29E; --team-a:#8AA6E8; --team-b:#F0A060; --together:#B79AE0; --ochre:#E0AE52; --slate:#93A3C6; --chip:#25302E; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
+header{display:flex;flex-direction:column;gap:10px;padding-block:8px 14px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.date{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex-shrink:0}
+.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--muted);padding:5px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--celadon);outline-offset:2px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,8vw,42px);line-height:1.1;margin:0;text-wrap:balance}
+h1 .a{color:var(--brick)} h1 .b{color:var(--celadon)}
+.sub{color:var(--muted);margin:0;max-width:60ch}
+
+/* tabs */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding-block:8px;border-bottom:1px solid var(--line)}
+.tabs button{font:inherit;font-size:14px;font-weight:500;border:0;border-radius:8px;background:transparent;color:var(--muted);padding:8px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+.tabs button small{font-family:var(--mono);font-size:11px;font-weight:500;font-variant-numeric:tabular-nums}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 0 0 1px var(--line)}
+.panel{padding-top:14px}
+
+.opt{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);margin:4px 0 0}
+.opt input{width:18px;height:18px;accent-color:var(--celadon)}
+
+/* schedule */
+.zone{margin-top:18px}
+.zone h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0 0 10px;display:flex;align-items:baseline;gap:10px}
+.zone h2 small{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.05em}
+.z1 h2{color:var(--brick)} .z2 h2{color:var(--celadon)}
+ol{list-style:none;margin:0;padding:0}
+li.stop{display:grid;grid-template-columns:56px 1fr;gap:12px;position:relative;padding-bottom:16px}
+li.stop::before{content:"";position:absolute;left:27px;top:26px;bottom:0;width:2px;background:var(--line)}
+li.stop:last-child::before{display:none}
+.time{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;padding-top:3px;position:relative;z-index:1;background:var(--bg);height:max-content;text-align:center}
+.z1 .time{color:var(--brick)} .z2 .time{color:var(--celadon)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.card h3{margin:0;font-size:16.5px;font-weight:700;line-height:1.35}
+.card p{margin:0;color:var(--muted);font-size:14px}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.meta span{font-size:12px;background:var(--chip);border-radius:5px;padding:2px 7px}
+.alts{font-size:13.5px;border-top:1px dashed var(--line);padding-top:6px;margin-top:2px}
+.alts b{font-weight:500}
+.maps{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.maps a{font-size:12.5px;font-weight:500;text-decoration:none;color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px 10px;display:inline-flex;align-items:center;gap:6px}
+.maps a i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.maps a.nv i{background:#03C75A} .maps a.kk i{background:#FEE500;box-shadow:0 0 0 1px #c9b400 inset}
+.transit{margin:18px 0 0;padding:12px 14px;border-radius:10px;border:1.5px dashed var(--muted);display:flex;flex-direction:column;gap:4px}
+.transit .row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.transit strong{font-size:15px}
+.transit p{margin:0;font-size:13.5px;color:var(--muted)}
+.notes{margin-top:24px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.notes h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0 0 8px}
+.notes ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+
+/* summary tabs */
+.total{display:flex;flex-direction:column;gap:2px;padding:4px 0 10px}
+.total .label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.total .big{font-family:var(--display);font-size:44px;line-height:1.05;font-variant-numeric:tabular-nums}
+.total .small{color:var(--muted);font-size:14px}
+.stepper{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
+.stepper button{font:inherit;width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:18px;cursor:pointer}
+.stepper output{font-family:var(--mono);font-size:16px;min-width:2ch;text-align:center;font-variant-numeric:tabular-nums}
+.bar{display:flex;height:14px;border-radius:4px;overflow:hidden;background:var(--chip);margin:6px 0 10px;gap:2px}
+.bar span{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin-bottom:14px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.c-transit{background:var(--slate)} .c-food{background:var(--brick)} .c-entry{background:var(--celadon)} .c-other{background:var(--ochre)}
+.c-walk{background:var(--celadon)} .c-subway{background:var(--slate)} .c-bus{background:var(--ochre)}
+.c-sight{background:var(--celadon)} .c-meal{background:var(--brick)} .c-move{background:var(--slate)}
+.ledger{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.grp td{background:var(--chip);font-weight:500;font-size:13px}
+tr.sum td{font-weight:700;border-bottom:0}
+td .dot{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:7px;vertical-align:1px}
+td small{display:block;color:var(--muted);font-size:12px}
+.foot{margin-top:12px;font-size:12.5px;color:var(--muted)}
+.tl{position:relative;margin:4px 0 6px}
+.tl .track{display:flex;height:26px;border-radius:6px;overflow:hidden;gap:2px}
+.tl .track span{height:100%}
+.tl .ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+/* map view */
+.viewbar{display:flex;justify-content:flex-end;margin-bottom:4px}
+.regions{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.regions button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:5px 12px;cursor:pointer}
+.regions button[aria-pressed="true"]{border-color:var(--fg);color:var(--fg);font-weight:500}
+.mapbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+#kmap{width:100%;height:380px}
+#kmap[hidden]{display:none!important}
+#svgmap svg{display:block;width:100%;height:auto}
+#svgmap text{font-family:var(--body)}
+.pinlist{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.pinlist li{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px;min-width:0}
+.pinlist .num{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:12px;color:var(--surface)}
+.pinlist .num.S{background:var(--brick)} .pinlist .num.W{background:var(--celadon)} .pinlist .num.T{background:var(--slate)}
+.pinlist .t{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pinlist .lk{display:flex;gap:6px}
+.pinlist .lk a{font-size:12px;text-decoration:none;color:var(--fg);border:1px solid var(--line);border-radius:5px;padding:2px 7px}
+.kpin{font:600 12px var(--mono);color:#fff;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+
+.z3 h2{color:var(--together)} .z3 .time{color:var(--together)}
+.c-sillim{background:var(--team-a)} .c-suwon{background:var(--team-b)} .c-together{background:var(--together)} .c-wait{background:var(--line)}
+.teamkey{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.teamkey>span{display:inline-flex;align-items:center;gap:6px}
+.teamkey i,.sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+h2.sect{font-family:var(--display);font-weight:400;font-size:21px;margin:18px 0 10px}
+.teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.team{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--team-a);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.team.t-suwon{border-top-color:var(--team-b)}
+.tname{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:700;font-size:15.5px}
+.t-sillim .tname{color:var(--team-a)} .t-suwon .tname{color:var(--team-b)}
+.fare{font-family:var(--mono);font-size:14px;color:var(--fg);font-variant-numeric:tabular-nums}
+.dep{font-size:14px} .dep b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.steps{display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.steps li{display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:start}
+.ln{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 11px var(--mono);color:#fff}
+.l1{background:#0052A4} .l2{background:#00A84D} .l4{background:#00A5DE} .lsb{background:#F5A200;font-family:var(--body);font-size:10.5px}
+.meetup{margin-top:14px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;background:var(--fg);color:var(--bg);border-radius:12px;padding:14px 16px}
+.meetup .mt{font-family:var(--display);font-size:34px;line-height:1}
+.meetup strong{font-size:16px} .meetup p{margin:4px 0 8px;font-size:13.5px;opacity:.8}
+.meetup .maps a{color:var(--bg);border-color:currentColor}
+table.acts{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:2px}
+table.acts td,table.acts th{padding:6px 0;border-bottom:1px dashed var(--line);vertical-align:top}
+table.acts th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;text-align:left}
+table.acts tr:last-child td{border-bottom:0}
+table.acts td b{font-weight:500}
+table.acts td small{display:block;color:var(--muted);font-size:12px}
+table.acts .n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
+.controls{display:flex;flex-direction:column;gap:8px;margin:4px 0 14px}
+.controls .stepper{margin:0}
+.budget{justify-content:space-between;flex-wrap:wrap}
+.money{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);color:var(--fg)}
+.money input{width:7.5em;font:inherit;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg);text-align:right}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.pp{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--team-a);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;font-size:12.5px;color:var(--muted)}
+.pp.t-suwon{border-left-color:var(--team-b)}
+.pp b{font-family:var(--display);font-weight:400;font-size:24px;color:var(--fg);font-variant-numeric:tabular-nums}
+.tlname{display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:4px} .tlname b{font-family:var(--mono);font-weight:500;margin-left:auto;font-size:12px;font-variant-numeric:tabular-nums}
+.tl+.tl{margin-top:12px}
+.tag{display:inline-block;font-size:11px;border-radius:4px;padding:0 5px;margin-right:6px;color:#fff;vertical-align:1px}
+.tag.a{background:var(--team-a)} .tag.b{background:var(--team-b)}
+.pinlist .num.M{background:var(--fg)}
+.c-transit{background:var(--slate)} .c-entry{background:var(--celadon)} .c-food{background:var(--brick)} .c-other{background:var(--ochre)}
+.c-shop{background:var(--ochre)}
+footer{margin-top:18px;font-size:12px;color:var(--muted)}
+[data-lang="en"] .ko,[data-lang="ko"] .en{display:none}
+@media (max-width:420px){.tabs button{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app" data-lang="ko">
+<header>
+  <div class="top">
+    <span class="date">13:00–17:00 · <span class="ko">두 팀 합류</span><span class="en">Two groups</span></span>
+    <div class="seg" role="group" aria-label="Language">
+      <button id="btn-ko" aria-pressed="true">한국어</button>
+      <button id="btn-en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+  <h1 class="ko"><span class="b">남산타워</span> · 명동 → <span class="a">성수</span></h1>
+  <h1 class="en"><span class="b">N Seoul Tower</span> · Myeongdong → <span class="a">Seongsu</span></h1>
+  <p class="sub ko">신림 팀과 수원 팀이 1시에 명동역에서 만나 남산타워, 다이소 명동역점, 성수 소금빵·카페까지. 5시에 성수에서 해산.</p>
+  <p class="sub en">The Sillim and Suwon groups meet at Myeongdong Station at 1pm, then N Seoul Tower, Daiso Myeongdong, and salt bread and cafés in Seongsu. Split up in Seongsu at 5pm.</p>
+  <div class="teamkey">
+    <span><i class="c-sillim"></i><span class="ko">신림 팀</span><span class="en">Sillim group</span></span>
+    <span><i class="c-suwon"></i><span class="ko">수원 팀</span><span class="en">Suwon group</span></span>
+    <span><i class="c-together"></i><span class="ko">함께</span><span class="en">Together</span></span>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button role="tab" id="t-plan" aria-controls="plan" aria-selected="true"><span class="ko">일정</span><span class="en">Plan</span><small>6 stops</small></button>
+  <button role="tab" id="t-cost" aria-controls="cost" aria-selected="false"><span class="ko">경비</span><span class="en">Cost</span><small id="tab-cost">–</small></button>
+  <button role="tab" id="t-time" aria-controls="time" aria-selected="false"><span class="ko">시간</span><span class="en">Time</span><small id="tab-time">–</small></button>
+  <button role="tab" id="t-dist" aria-controls="dist" aria-selected="false"><span class="ko">거리</span><span class="en">Distance</span><small id="tab-dist">–</small></button>
+</nav>
+
+<!-- PLAN -->
+<section class="panel" id="plan" role="tabpanel" aria-labelledby="t-plan">
+  <div class="viewbar">
+    <div class="seg" role="group" aria-label="View">
+      <button id="v-list" aria-pressed="true"><span class="ko">목록</span><span class="en">List</span></button>
+      <button id="v-map" aria-pressed="false"><span class="ko">지도 보기</span><span class="en">Map View</span></button>
+    </div>
+  </div>
+
+  <div id="mapview" hidden>
+    <div class="regions" role="group" aria-label="Area">
+      <button data-r="N" aria-pressed="true"><span class="ko">남산 · 명동</span><span class="en">Namsan · Myeongdong</span></button>
+      <button data-r="S" aria-pressed="false"><span class="ko">성수</span><span class="en">Seongsu</span></button>
+      <button data-r="A" aria-pressed="false"><span class="ko">두 팀 경로</span><span class="en">Both routes</span></button>
+    </div>
+    <div class="mapbox"><div id="kmap"></div><div id="svgmap"></div></div>
+    <ol class="pinlist" id="pinlist"></ol>
+    <p class="foot" id="mapnote"></p>
+  </div>
+
+  <div id="listview">
+
+  <h2 class="sect"><span class="ko">출발 · 1시까지 명동역</span><span class="en">Getting there · Myeongdong Stn by 1pm</span></h2>
+  <div class="teams">
+    <div class="team t-sillim">
+      <div class="tname"><span class="ko">신림 팀</span><span class="en">Sillim group</span><span class="fare">₩1,750</span></div>
+      <div class="dep"><b>12:15</b> <span class="ko">신림역 출발</span><span class="en">leave Sillim Stn</span> → <b>~12:52</b> <span class="ko">명동역</span><span class="en">Myeongdong</span></div>
+      <ol class="steps">
+        <li><span class="ln l2">2</span><span class="ko">2호선 <b>사당 방면</b> 4정거장 → 사당 하차</span><span class="en">Line 2 toward <b>Sadang</b>, 4 stops</span></li>
+        <li><span class="ln l4">4</span><span class="ko">4호선 <b>당고개·진접 방면</b> 환승 → 10정거장 → 명동 하차</span><span class="en">Change to Line 4 toward <b>Danggogae/Jinjeop</b>, 10 stops to Myeongdong</span></li>
+      </ol>
+      <div class="meta"><span>~37 min</span><span class="ko">환승 1회</span><span class="en">1 transfer</span></div>
+    </div>
+    <div class="team t-suwon">
+      <div class="tname"><span class="ko">수원 팀</span><span class="en">Suwon group</span><span class="fare">₩2,350</span></div>
+      <div class="dep"><b>11:20</b> <span class="ko">수원시청역 출발</span><span class="en">leave Suwon City Hall Stn</span> → <b>~12:50</b> <span class="ko">명동역</span><span class="en">Myeongdong</span></div>
+      <ol class="steps">
+        <li><span class="ln lsb">수</span><span class="ko">수인분당선 <b>인천 방면</b> 2정거장 → 수원 하차</span><span class="en">Suin–Bundang toward <b>Incheon</b>, 2 stops to Suwon</span></li>
+        <li><span class="ln l1">1</span><span class="ko">1호선 <b>서울역·청량리 방면</b> 환승 (급행이면 더 빠름) → 서울역 하차</span><span class="en">Change to Line 1 toward <b>Seoul Stn/Cheongnyangni</b> (express is faster), get off at Seoul Stn</span></li>
+        <li><span class="ln l4">4</span><span class="ko">4호선 <b>당고개·진접 방면</b> 환승 → 2정거장 → 명동 하차</span><span class="en">Change to Line 4 toward <b>Danggogae/Jinjeop</b>, 2 stops to Myeongdong</span></li>
+      </ol>
+      <div class="meta"><span>~90 min</span><span class="ko">환승 2회</span><span class="en">2 transfers</span></div>
+    </div>
+  </div>
+
+  <div class="meetup">
+    <div class="mt">13:00</div>
+    <div>
+      <strong class="ko">만나는 곳 · 명동역 (4호선) 3번 출구 앞</strong>
+      <strong class="en">Meet · outside Myeongdong Stn (Line 4) Exit 3</strong>
+      <p class="ko">케이블카 승강장 쪽으로 가장 가까운 출구예요. 먼저 도착한 팀은 개찰구 안에서 기다리지 말고 3번 출구 계단 위에서 기다리기.</p>
+      <p class="en">This is the exit closest to the cable car. Whoever arrives first waits at the top of the Exit 3 stairs, not inside the gates.</p>
+      <div class="maps" data-q="명동역 3번출구"></div>
+    </div>
+  </div>
+
+  <div class="zone z2">
+    <h2><span class="ko">남산서울타워</span><span class="en">N Seoul Tower</span><small>13:00–14:40</small></h2>
+    <ol>
+      <li class="stop"><div class="time">13:00</div><div class="card">
+        <h3 class="ko">명동역 → 남산 케이블카 승강장 (도보)</h3><h3 class="en">Myeongdong Stn → Namsan Cable Car (walk)</h3>
+        <p class="ko">3번 출구에서 오르막 약 10분. 중간의 무료 경사형 엘리베이터 '남산오르미'를 타면 덜 힘들어요.</p>
+        <p class="en">About 10 minutes uphill from Exit 3. The free inclined elevator "Namsan Oreumi" on the way saves the steepest part.</p>
+        <div class="meta"><span>~15 min</span><span class="ko">무료</span><span class="en">Free</span></div>
+        <div class="maps" data-q="남산케이블카"></div>
+      </div></li>
+
+      <li class="stop"><div class="time">13:15</div><div class="card">
+        <h3 class="ko">남산 케이블카 (왕복)</h3><h3 class="en">Namsan Cable Car (round trip)</h3>
+        <p class="ko">약 10분 간격 운행, 매일 10:00–23:00. 내려올 때도 타니 왕복권으로 구매.</p>
+        <p class="en">Runs about every 10 minutes, daily 10:00–23:00. Buy a round-trip ticket since you'll ride back down.</p>
+        <div class="meta"><span class="ko">성인 왕복 15,000원</span><span class="en">Adult round trip ₩15,000</span><span class="ko">편도 12,000원</span><span class="en">One way ₩12,000</span></div>
+      </div></li>
+
+      <li class="stop"><div class="time">13:25</div><div class="card">
+        <h3 class="ko">N서울타워에서 할 것</h3><h3 class="en">Things to do at N Seoul Tower</h3>
+        <table class="acts">
+          <tr><td><b class="ko">타워 광장 · 서울 전망</b><b class="en">Tower plaza · city views</b><small class="ko">광장과 팔각정에서 서울 시내가 한눈에</small><small class="en">Wide views from the plaza and Palgakjeong pavilion</small></td><td class="n ko">무료</td><td class="n en">Free</td></tr>
+          <tr><td><b class="ko">사랑의 자물쇠</b><b class="en">Love locks</b><small class="ko">현장 판매. 집에서 자물쇠를 챙겨오면 무료로 걸 수 있어요.</small><small class="en">Sold on site; bring your own lock and it's free</small></td><td class="n ko">약 1만 원 (현장 확인)</td><td class="n en">~₩10,000 (check on site)</td></tr>
+          <tr><td><b class="ko">전망대 (선택)</b><b class="en">Observatory (optional)</b><small class="ko">360° 실내 전망. 온라인 할인가 약 25,900원</small><small class="en">360° indoor view. About ₩25,900 when booked online</small></td><td class="n">₩29,000</td></tr>
+          <tr><td><b class="ko">타워 아래 간식</b><b class="en">Snack below the tower</b><small class="ko">아이스크림·음료 등</small><small class="en">Ice cream, drinks</small></td><td class="n ko">약 5천 원</td><td class="n en">~₩5,000</td></tr>
+        </table>
+        <div class="meta"><span>~65 min</span><span class="ko">전망대 매일 10:00–22:30</span><span class="en">Observatory daily 10:00–22:30</span></div>
+        <div class="maps" data-q="N서울타워"></div>
+      </div></li>
+
+      <li class="stop"><div class="time">14:30</div><div class="card">
+        <h3 class="ko">케이블카로 하산 → 다이소까지 도보</h3><h3 class="en">Cable car down → walk to Daiso</h3>
+        <p class="ko">승강장에서 명동역 방향으로 다시 걸어 내려가요.</p>
+        <p class="en">Walk back down toward Myeongdong Station from the lower cable car station.</p>
+        <div class="meta"><span>~20 min</span></div>
+      </div></li>
+    </ol>
+  </div>
+
+  <div class="zone z3">
+    <h2><span class="ko">명동</span><span class="en">Myeongdong</span><small>14:50–15:30</small></h2>
+    <ol>
+      <li class="stop"><div class="time">14:50</div><div class="card">
+        <h3 class="ko">다이소 명동역점 (12층) · 뷰티 쇼핑 40분</h3><h3 class="en">Daiso Myeongdong Station branch (12 floors) · 40 min beauty shopping</h3>
+        <p class="ko">퇴계로 134-1, 명동역 바로 앞. 매일 10:00–22:00. 뷰티 코너는 저층(2층으로 소개됨)에 있어요. 층 구성은 바뀔 수 있으니 입구 층별 안내 확인.</p>
+        <p class="en">Toegye-ro 134-1, right by Myeongdong Station. Open daily 10:00–22:00. Beauty is on a lower floor (reported as 2F); check the floor guide at the entrance as layouts change.</p>
+        <table class="acts">
+          <tr><th class="ko">추천 뷰티템</th><th class="en">Recommended</th><th class="n ko">가격</th><th class="n en">Price</th></tr>
+          <tr><td><b>VT PDRN 광채 토너 200ml</b><small class="ko">속건조·수분 보충</small><small class="en">Hydrating toner</small></td><td class="n">₩5,000</td></tr>
+          <tr><td><b>본셉 레티놀 세럼 30ml</b><small class="ko">모공·탄력</small><small class="en">Retinol serum for pores and firmness</small></td><td class="n">₩5,000</td></tr>
+          <tr><td><b>더랩바이블랑두 히알 물광 크림</b><small class="ko">화장 들뜸 방지 보습</small><small class="en">Moisturizer that keeps makeup from lifting</small></td><td class="n">₩5,000</td></tr>
+          <tr><td><b>TAG 코렉팅 선베이스</b><small class="ko">톤 보정 선베이스</small><small class="en">Tone-correcting sun base</small></td><td class="n">₩5,000</td></tr>
+          <tr><td><b>VT 3단계 시트마스크</b><small class="ko">선물용으로도 인기</small><small class="en">Popular as a gift</small></td><td class="n ko">현장 확인</td><td class="n en">Check in store</td></tr>
+          <tr><td><b>Daily Comma 고체 향수 · 바세린 립</b><small class="ko">가방에 넣기 좋은 소품</small><small class="en">Small bag-sized items</small></td><td class="n">₩3,000</td></tr>
+        </table>
+        <div class="meta"><span>40 min</span><span class="ko">대부분 1천~5천 원</span><span class="en">Most items ₩1,000–5,000</span></div>
+        <div class="maps" data-q="다이소 명동역점"></div>
+      </div></li>
+    </ol>
+    <div class="transit">
+      <div class="row ko"><span>15:30 명동역</span><span>→</span><span>동대문역사문화공원 환승</span><span>→</span><span>~16:00 성수역</span></div>
+      <div class="row en"><span>15:30 Myeongdong</span><span>→</span><span>change at DDP</span><span>→</span><span>~16:00 Seongsu Stn</span></div>
+      <strong class="ko">4호선 2정거장 → 2호선 (성수 방면) 6정거장, 약 30분 · ₩1,550</strong>
+      <strong class="en">Line 4, 2 stops → Line 2 toward Seongsu, 6 stops, ~30 min · ₩1,550</strong>
+    </div>
+  </div>
+
+  <div class="zone z1">
+    <h2><span class="ko">성수</span><span class="en">Seongsu</span><small>16:00–17:00</small></h2>
+    <ol>
+      <li class="stop"><div class="time">16:00</div><div class="card">
+        <h3 class="ko">자연도소금빵 in 성수 (포장)</h3><h3 class="en">Jayeondo Salt Bread in Seongsu (takeout)</h3>
+        <p class="ko">성수 대표 소금빵집. 4개 단위로만 판매, 키오스크 결제 후 픽업. 매장 좌석이 없어 포장해서 카페로. 오후 굽는 시간은 15:30, 17:00쯤이라는 후기가 많아요.</p>
+        <p class="en">Seongsu's best-known salt bread shop. Sold only in sets of four; pay at the kiosk, then pick up. No seating, so take it to the café. Reviewers mention afternoon bakes around 15:30 and 17:00.</p>
+        <div class="meta"><span class="ko">4개 12,000원</span><span class="en">Set of 4 ₩12,000</span><span class="ko">매일 09:00–22:00</span><span class="en">Daily 09:00–22:00</span><span>연무장길 56-1</span></div>
+        <div class="maps" data-q="자연도소금빵 성수"></div>
+      </div></li>
+
+      <li class="stop"><div class="time">16:15</div><div class="card">
+        <h3 class="ko">카페 어니언 성수</h3><h3 class="en">Café Onion Seongsu</h3>
+        <p class="ko">옛 공장을 개조한 성수 대표 카페. 슈가파우더 듬뿍 올린 팡도르가 시그니처. 여기에도 소금빵이 있어서 비교해 먹어보기 좋아요.</p>
+        <p class="en">The converted-factory café that defines Seongsu. The pandoro under a snowdrift of powdered sugar is the signature. They also sell salt bread, so you can compare.</p>
+        <table class="acts">
+          <tr><td><b class="ko">팡도르</b><b class="en">Pandoro</b></td><td class="n">₩6,000</td></tr>
+          <tr><td><b class="ko">아메리카노</b><b class="en">Americano</b></td><td class="n">₩5,500</td></tr>
+          <tr><td><b class="ko">카페라떼</b><b class="en">Café latte</b></td><td class="n">₩6,000</td></tr>
+          <tr><td><b class="ko">소금빵</b><b class="en">Salt bread</b></td><td class="n">₩3,000</td></tr>
+        </table>
+        <div class="meta"><span>~35 min</span><span>아차산로9길 8</span><span class="ko">성수역 2번 출구 근처</span><span class="en">Near Seongsu Stn Exit 2</span></div>
+        <div class="maps" data-q="어니언 성수"></div>
+      </div></li>
+
+      <li class="stop"><div class="time">16:50</div><div class="card">
+        <h3 class="ko">연무장길 팝업 구경 → 성수역</h3><h3 class="en">Yeonmujang-gil pop-ups → Seongsu Stn</h3>
+        <p class="ko">시간이 남으면 연무장길 팝업스토어를 가볍게 구경하고 성수역에서 해산. 팝업은 매주 바뀌니 당일 인스타그램 확인.</p>
+        <p class="en">If time allows, browse the Yeonmujang-gil pop-up stores, then split up at Seongsu Station. Pop-ups change weekly; check Instagram on the day.</p>
+        <div class="meta"><span>~10 min</span><span class="ko">무료</span><span class="en">Free</span></div>
+        <div class="maps" data-q="연무장길"></div>
+      </div></li>
+    </ol>
+  </div>
+
+  <h2 class="sect"><span class="ko">귀가 · 17:00 성수역에서 해산</span><span class="en">Going home · split at Seongsu Stn, 17:00</span></h2>
+  <div class="teams">
+    <div class="team t-sillim">
+      <div class="tname"><span class="ko">신림 팀 → 신림역</span><span class="en">Sillim group → Sillim Stn</span><span class="fare">₩1,950</span></div>
+      <div class="dep"><b>17:00</b> <span class="ko">성수역</span><span class="en">Seongsu</span> → <b>~17:45</b> <span class="ko">신림역</span><span class="en">Sillim</span></div>
+      <ol class="steps">
+        <li><span class="ln l2">2</span><span class="ko">2호선 <b>건대입구·잠실 방면</b> 19정거장 → 신림 하차 (환승 없음)</span><span class="en">Line 2 toward <b>Konkuk Univ./Jamsil</b>, 19 stops to Sillim, no transfer</span></li>
+      </ol>
+      <div class="meta"><span>~45 min</span><span class="ko">퇴근길이라 붐빔</span><span class="en">Rush hour</span></div>
+    </div>
+    <div class="team t-suwon">
+      <div class="tname"><span class="ko">수원 팀 → 수원역</span><span class="en">Suwon group → Suwon Stn</span><span class="fare">₩2,450</span></div>
+      <div class="dep"><b>17:00</b> <span class="ko">성수역</span><span class="en">Seongsu</span> → <b>~18:35</b> <span class="ko">수원역</span><span class="en">Suwon</span></div>
+      <ol class="steps">
+        <li><span class="ln l2">2</span><span class="ko">2호선 <b>왕십리 방면</b> 3정거장 → 왕십리 하차</span><span class="en">Line 2 toward <b>Wangsimni</b>, 3 stops</span></li>
+        <li><span class="ln lsb">수</span><span class="ko">수인분당선 <b>수원·인천 방면</b> 환승 → 수원 하차</span><span class="en">Change to Suin–Bundang toward <b>Suwon/Incheon</b>, get off at Suwon</span></li>
+      </ol>
+      <div class="meta"><span>~95 min</span><span class="ko">환승 1회</span><span class="en">1 transfer</span></div>
+    </div>
+  </div>
+
+  <section class="notes">
+    <h2 class="ko">출발 전 체크</h2><h2 class="en">Before you go</h2>
+    <ul class="ko">
+      <li>남산은 오르막이 많아요. 편한 신발 필수.</li>
+      <li>사랑의 자물쇠를 걸 거라면 다이소에서 미리 사서 가면 저렴해요. 다이소는 타워 다음 일정이니 집 근처에서 준비.</li>
+      <li>케이블카는 주말 오후에 줄이 길어요. 대안은 충무로역에서 남산순환버스 01A·01B (₩1,400대, 6–18분 간격).</li>
+      <li>요금은 교통카드 성인 기준 추정치예요. 당일 네이버·카카오맵으로 다시 확인하세요.</li>
+    </ul>
+    <ul class="en">
+      <li>Namsan is steep; wear comfortable shoes.</li>
+      <li>If you want a love lock, bring one from home. It's cheaper than buying at the tower, and Daiso comes after the tower in this plan.</li>
+      <li>Cable car lines get long on weekend afternoons. The backup is the Namsan circular bus 01A/01B from Chungmuro Station (about ₩1,400, every 6–18 min).</li>
+      <li>Fares are adult transit-card estimates. Recheck on Naver or Kakao Map on the day.</li>
+    </ul>
+  </section>
+  </div>
+</section>
+
+<!-- COST -->
+<section class="panel" id="cost" role="tabpanel" aria-labelledby="t-cost" hidden>
+  <div class="total">
+    <span class="label ko">두 팀 예상 총 경비</span><span class="label en">Expected total, both groups</span>
+    <span class="big" id="cost-total">–</span>
+    <span class="small" id="cost-per">–</span>
+  </div>
+  <div class="controls">
+    <div class="stepper"><span class="sw c-sillim"></span><span class="ko">신림 팀</span><span class="en">Sillim</span>
+      <button id="am" aria-label="Fewer people in Sillim group">−</button><output id="an" aria-live="polite">2</output><button id="ap" aria-label="More people in Sillim group">+</button></div>
+    <div class="stepper"><span class="sw c-suwon"></span><span class="ko">수원 팀</span><span class="en">Suwon</span>
+      <button id="bm" aria-label="Fewer people in Suwon group">−</button><output id="bn" aria-live="polite">2</output><button id="bp" aria-label="More people in Suwon group">+</button></div>
+    <label class="opt" for="obs"><input type="checkbox" id="obs"><span class="ko">전망대 입장 포함 (₩29,000)</span><span class="en">Include the observatory (₩29,000)</span></label>
+    <label class="opt" for="lock"><input type="checkbox" id="lock"><span class="ko">사랑의 자물쇠 현장 구매 (팀당 1개, 약 ₩10,000)</span><span class="en">Buy a love lock on site (1 per group, ~₩10,000)</span></label>
+    <label class="opt budget" for="shop"><span class="ko">다이소 쇼핑 예산 (1인)</span><span class="en">Daiso budget per person</span>
+      <span class="money">₩<input type="number" id="shop" min="0" step="1000" value="20000" inputmode="numeric"></span></label>
+  </div>
+  <div class="cards2">
+    <div class="pp t-sillim"><span class="ko">신림 팀 1인</span><span class="en">Sillim, each</span><b id="per-a">–</b></div>
+    <div class="pp t-suwon"><span class="ko">수원 팀 1인</span><span class="en">Suwon, each</span><b id="per-b">–</b></div>
+  </div>
+  <div class="bar" id="cost-bar"></div>
+  <div class="legend" id="cost-legend"></div>
+  <div class="ledger"><table id="cost-table"></table></div>
+  <p class="foot ko">교통비는 교통카드 성인 기준 추정치(기본 1,550원 + 거리 추가). 소금빵은 4개 세트를 2명이 나누는 기준(1인 ₩6,000). 쇼핑 예산은 직접 바꿀 수 있어요.</p>
+  <p class="foot en">Fares are adult transit-card estimates (₩1,550 base plus distance). Salt bread assumes two people share a set of four (₩6,000 each). You can change the shopping budget.</p>
+</section>
+
+<!-- TIME -->
+<section class="panel" id="time" role="tabpanel" aria-labelledby="t-time" hidden>
+  <div class="total">
+    <span class="label ko">함께하는 시간</span><span class="label en">Time together</span>
+    <span class="big">4<span class="ko">시간</span><span class="en">h</span></span>
+    <span class="small">13:00 → 17:00</span>
+  </div>
+  <div class="tl"><div class="tlname"><span class="sw c-sillim"></span><span class="ko">신림 팀</span><span class="en">Sillim</span> <b id="ta">–</b></div><div class="track" id="tl-a"></div><div class="ticks" id="tk-a"></div></div>
+  <div class="tl"><div class="tlname"><span class="sw c-suwon"></span><span class="ko">수원 팀</span><span class="en">Suwon</span> <b id="tb">–</b></div><div class="track" id="tl-b"></div><div class="ticks" id="tk-b"></div></div>
+  <div class="legend" id="time-legend"></div>
+  <div class="ledger"><table id="time-table"></table></div>
+  <p class="foot ko">케이블카 대기와 소금빵 줄에 따라 15–30분 늘어날 수 있어요.</p>
+  <p class="foot en">Cable car and salt bread queues can add 15–30 minutes.</p>
+</section>
+
+<!-- DISTANCE -->
+<section class="panel" id="dist" role="tabpanel" aria-labelledby="t-dist" hidden>
+  <div class="total">
+    <span class="label ko">함께 이동한 거리</span><span class="label en">Distance together</span>
+    <span class="big" id="dist-shared">–</span>
+    <span class="small" id="dist-walk">–</span>
+  </div>
+  <div class="cards2">
+    <div class="pp t-sillim"><span class="ko">신림 팀 총 이동</span><span class="en">Sillim, door to door</span><b id="dist-a">–</b></div>
+    <div class="pp t-suwon"><span class="ko">수원 팀 총 이동</span><span class="en">Suwon, door to door</span><b id="dist-b">–</b></div>
+  </div>
+  <div class="bar" id="dist-bar"></div>
+  <div class="legend" id="dist-legend"></div>
+  <div class="ledger"><table id="dist-table"></table></div>
+  <p class="foot ko">지하철 거리는 노선 기준, 도보 거리는 지도상 추정치예요. 걸음 수는 1km ≈ 1,350보로 계산.</p>
+  <p class="foot en">Subway distance follows the lines; walking distances are map estimates. Steps assume about 1,350 per km.</p>
+</section>
+
+<footer class="ko">모든 수치는 예상치예요. 당일 네이버·카카오맵으로 다시 확인하세요.</footer>
+<footer class="en">All figures are estimates. Recheck on Naver or Kakao Map on the day.</footer>
+</div>
+
+<script>
+(function(){
+  var app=document.getElementById('app');
+  var lang='ko', nA=2, nB=2, obs=false, lock=false, shop=20000;
+
+  /* ---- cost data (per person unless noted) ---- */
+  // who: 'A' Sillim only, 'B' Suwon only, 'X' everyone; per:'group' = once per group
+  var COST=[
+    {g:'transit',who:'A',ko:'신림역 → 명동역',en:'Sillim → Myeongdong',v:1750},
+    {g:'transit',who:'B',ko:'수원시청역 → 명동역',en:'Suwon City Hall → Myeongdong',v:2350},
+    {g:'transit',who:'X',ko:'남산 케이블카 왕복',en:'Namsan Cable Car round trip',v:15000},
+    {g:'transit',who:'X',ko:'명동역 → 성수역',en:'Myeongdong → Seongsu',v:1550},
+    {g:'transit',who:'A',ko:'성수역 → 신림역',en:'Seongsu → Sillim',v:1950},
+    {g:'transit',who:'B',ko:'성수역 → 수원역',en:'Seongsu → Suwon Stn',v:2450},
+    {g:'entry',who:'X',ko:'N서울타워 전망대',en:'N Seoul Tower observatory',v:29000,flag:'obs'},
+    {g:'entry',who:'G',ko:'사랑의 자물쇠 (팀당 1개)',en:'Love lock (1 per group)',v:10000,flag:'lock'},
+    {g:'food',who:'X',ko:'타워 간식',en:'Snack at the tower',v:5000},
+    {g:'food',who:'X',ko:'자연도소금빵 (4개 세트 ÷ 2명)',en:'Jayeondo salt bread (set of 4 ÷ 2)',v:6000},
+    {g:'food',who:'X',ko:'어니언 · 음료 + 팡도르',en:'Onion · drink + pandoro',v:11500},
+    {g:'shop',who:'X',ko:'다이소 뷰티 쇼핑',en:'Daiso beauty shopping',v:0,shop:true}
+  ];
+  var CG={transit:{ko:'교통',en:'Transport',c:'c-transit'},entry:{ko:'입장·체험',en:'Entry',c:'c-entry'},food:{ko:'식비',en:'Food',c:'c-food'},shop:{ko:'쇼핑',en:'Shopping',c:'c-other'}};
+
+  /* ---- time data ---- */
+  var SHARED=[
+    {s:'13:00',m:15,g:'move',ko:'명동역 → 케이블카 승강장',en:'Myeongdong → cable car'},
+    {s:'13:15',m:10,g:'move',ko:'케이블카 상행',en:'Cable car up'},
+    {s:'13:25',m:65,g:'sight',ko:'N서울타워',en:'N Seoul Tower'},
+    {s:'14:30',m:20,g:'move',ko:'케이블카 하행 · 도보',en:'Cable car down · walk'},
+    {s:'14:50',m:40,g:'shop',ko:'다이소 명동역점',en:'Daiso Myeongdong'},
+    {s:'15:30',m:30,g:'move',ko:'명동역 → 성수역',en:'Myeongdong → Seongsu'},
+    {s:'16:00',m:15,g:'meal',ko:'자연도소금빵',en:'Jayeondo salt bread'},
+    {s:'16:15',m:35,g:'meal',ko:'카페 어니언',en:'Café Onion'},
+    {s:'16:50',m:10,g:'sight',ko:'연무장길 → 성수역',en:'Yeonmujang-gil → station'}
+  ];
+  var TEAM={
+    A:{pre:{s:'12:15',m:37,ko:'신림역 → 명동역',en:'Sillim → Myeongdong'},post:{s:'17:00',m:45,ko:'성수역 → 신림역',en:'Seongsu → Sillim'}},
+    B:{pre:{s:'11:20',m:90,ko:'수원시청역 → 명동역',en:'Suwon City Hall → Myeongdong'},post:{s:'17:00',m:95,ko:'성수역 → 수원역',en:'Seongsu → Suwon Stn'}}
+  };
+  var TG={move:{ko:'이동',en:'Travel',c:'c-move'},sight:{ko:'관광',en:'Sightseeing',c:'c-sight'},shop:{ko:'쇼핑',en:'Shopping',c:'c-shop'},meal:{ko:'먹기',en:'Food',c:'c-meal'},wait:{ko:'대기',en:'Waiting',c:'c-wait'}};
+
+  /* ---- distance data ---- */
+  var DIST=[
+    {who:'A',g:'subway',km:17.0,ko:'신림역 → 명동역',en:'Sillim → Myeongdong'},
+    {who:'B',g:'subway',km:46.0,ko:'수원시청역 → 명동역',en:'Suwon City Hall → Myeongdong'},
+    {who:'X',g:'walk',km:0.8,ko:'명동역 → 케이블카',en:'Myeongdong → cable car'},
+    {who:'X',g:'cable',km:1.2,ko:'케이블카 왕복',en:'Cable car round trip'},
+    {who:'X',g:'walk',km:1.0,ko:'타워 광장 산책',en:'Tower plaza walk'},
+    {who:'X',g:'walk',km:0.9,ko:'케이블카 → 다이소',en:'Cable car → Daiso'},
+    {who:'X',g:'walk',km:0.5,ko:'다이소 매장 안',en:'Inside Daiso'},
+    {who:'X',g:'subway',km:8.0,ko:'명동역 → 성수역',en:'Myeongdong → Seongsu'},
+    {who:'X',g:'walk',km:1.5,ko:'성수 골목 산책',en:'Seongsu walk'},
+    {who:'A',g:'subway',km:27.0,ko:'성수역 → 신림역',en:'Seongsu → Sillim'},
+    {who:'B',g:'subway',km:54.0,ko:'성수역 → 수원역',en:'Seongsu → Suwon Stn'}
+  ];
+  var DG={walk:{ko:'도보',en:'Walking',c:'c-walk'},subway:{ko:'지하철',en:'Subway',c:'c-subway'},cable:{ko:'케이블카',en:'Cable car',c:'c-bus'}};
+
+  /* ---- helpers ---- */
+  function T(o){return o[lang]}
+  function won(n){return '₩'+(Math.round(n/10)*10).toLocaleString('en-US')}
+  function hm(min){var h=Math.floor(min/60),m=min%60;return lang==='ko'?(h?h+'시간 ':'')+(m?m+'분':''):(h?h+'h ':'')+(m?m+'m':'')}
+  function toMin(s){var p=s.split(':');return +p[0]*60+ +p[1]}
+  function fmt(t){var h=Math.floor(t/60),m=t%60;return (h<10?'0':'')+h+':'+(m<10?'0':'')+m}
+  function km(n){return n.toFixed(1)+' km'}
+  function val(x){return x.shop?shop:x.v}
+  function on(x){return !(x.flag==='obs'&&!obs)&&!(x.flag==='lock'&&!lock)}
+  function perPerson(team){var t=0;COST.forEach(function(x){if(!on(x)||x.who==='G')return;if(x.who==='X'||x.who===team)t+=val(x)});var n=team==='A'?nA:nB;if(lock&&n>0)t+=10000/n;return t}
+  function lineTotal(x){if(!on(x))return 0;if(x.who==='G')return x.v*((nA>0?1:0)+(nB>0?1:0));var n=x.who==='A'?nA:x.who==='B'?nB:nA+nB;return val(x)*n}
+  function whoLabel(w){return w==='A'?(lang==='ko'?'신림 팀':'Sillim'):w==='B'?(lang==='ko'?'수원 팀':'Suwon'):w==='G'?(lang==='ko'?'팀당':'per group'):(lang==='ko'?'모두':'everyone')}
+
+  document.querySelectorAll('.maps').forEach(function(el){
+    var q=encodeURIComponent(el.getAttribute('data-q'));
+    el.innerHTML='<a class="nv" href="https://map.naver.com/p/search/'+q+'" target="_blank" rel="noopener"><i></i>Naver Map ↗</a>'+
+                 '<a class="kk" href="https://map.kakao.com/link/search/'+q+'" target="_blank" rel="noopener"><i></i>Kakao Map ↗</a>';
+  });
+
+  function drawTrack(trackId,tickId,rows,start,end){
+    var span=end-start,tr=document.getElementById(trackId);tr.innerHTML='';
+    rows.forEach(function(x){var s=document.createElement('span');s.className=TG[x.g].c;s.style.width=(x.m/span*100)+'%';s.title=x.s+' '+T(x);tr.appendChild(s)});
+    var tk=document.getElementById(tickId);tk.innerHTML='';
+    [start,toMin('13:00'),toMin('17:00'),end].forEach(function(t){var e=document.createElement('span');e.textContent=fmt(t);tk.appendChild(e)});
+  }
+
+  function render(){
+    // cost
+    var pa=perPerson('A'),pb=perPerson('B'),tot=pa*nA+pb*nB;
+    document.getElementById('cost-total').textContent=won(tot);
+    document.getElementById('cost-per').textContent=lang==='ko'?('신림 팀 '+nA+'명 + 수원 팀 '+nB+'명'):('Sillim '+nA+' + Suwon '+nB+' people');
+    document.getElementById('per-a').textContent=won(pa);document.getElementById('per-b').textContent=won(pb);
+    document.getElementById('tab-cost').textContent=won(tot);
+    document.getElementById('an').textContent=nA;document.getElementById('bn').textContent=nB;
+    var cs={};COST.forEach(function(x){cs[x.g]=(cs[x.g]||0)+lineTotal(x)});
+    var bar=document.getElementById('cost-bar'),lg=document.getElementById('cost-legend');bar.innerHTML='';lg.innerHTML='';
+    Object.keys(CG).forEach(function(k){var v=cs[k]||0;if(!v)return;var s=document.createElement('span');s.className=CG[k].c;s.style.width=(v/tot*100)+'%';bar.appendChild(s);
+      var l=document.createElement('span');l.innerHTML='<i class="'+CG[k].c+'"></i>'+T(CG[k])+' · '+won(v);lg.appendChild(l)});
+    var h='<tr><th>'+(lang==='ko'?'항목':'Item')+'</th><th class="n">'+(lang==='ko'?'단가':'Each')+'</th><th class="n">'+(lang==='ko'?'합계':'Total')+'</th></tr>';
+    Object.keys(CG).forEach(function(g){
+      var rows=COST.filter(function(x){return x.g===g&&on(x)});if(!rows.length)return;
+      h+='<tr class="grp"><td colspan="2"><span class="dot '+CG[g].c+'"></span>'+T(CG[g])+'</td><td class="n">'+won(cs[g])+'</td></tr>';
+      rows.forEach(function(x){var n=x.who==='A'?nA:x.who==='B'?nB:x.who==='G'?((nA>0?1:0)+(nB>0?1:0)):nA+nB;
+        h+='<tr><td>'+T(x)+'<small>'+whoLabel(x.who)+' × '+n+'</small></td><td class="n">'+won(val(x))+'</td><td class="n">'+won(lineTotal(x))+'</td></tr>'});
+    });
+    h+='<tr class="sum"><td>'+(lang==='ko'?'합계':'Total')+'</td><td></td><td class="n">'+won(tot)+'</td></tr>';
+    document.getElementById('cost-table').innerHTML=h;
+
+    // time
+    ['A','B'].forEach(function(t){
+      var pre=TEAM[t].pre,post=TEAM[t].post,s=toMin(pre.s),arr=s+pre.m,end=toMin(post.s)+post.m;
+      var rows=[{s:pre.s,m:pre.m,g:'move',ko:pre.ko,en:pre.en}];
+      if(toMin('13:00')>arr)rows.push({s:fmt(arr),m:toMin('13:00')-arr,g:'wait',ko:'대기',en:'Waiting'});
+      rows=rows.concat(SHARED);rows.push({s:post.s,m:post.m,g:'move',ko:post.ko,en:post.en});
+      drawTrack(t==='A'?'tl-a':'tl-b',t==='A'?'tk-a':'tk-b',rows,s,end);
+      document.getElementById(t==='A'?'ta':'tb').textContent=hm(end-s)+' · '+pre.s+'–'+fmt(end);
+    });
+    document.getElementById('tab-time').textContent=lang==='ko'?'4시간':'4h';
+    var sums={};SHARED.forEach(function(x){sums[x.g]=(sums[x.g]||0)+x.m});
+    var tl=document.getElementById('time-legend');tl.innerHTML='';
+    Object.keys(TG).forEach(function(k){var l=document.createElement('span');l.innerHTML='<i class="'+TG[k].c+'"></i>'+T(TG[k])+(sums[k]?' · '+hm(sums[k]):'');tl.appendChild(l)});
+    h='<tr><th>'+(lang==='ko'?'시작':'Start')+'</th><th>'+(lang==='ko'?'구간':'Segment')+'</th><th class="n">'+(lang==='ko'?'소요':'Duration')+'</th></tr>';
+    var all=[{s:TEAM.B.pre.s,m:TEAM.B.pre.m,g:'move',ko:'🟧 '+TEAM.B.pre.ko,en:'🟧 '+TEAM.B.pre.en},{s:TEAM.A.pre.s,m:TEAM.A.pre.m,g:'move',ko:'🟦 '+TEAM.A.pre.ko,en:'🟦 '+TEAM.A.pre.en}].concat(SHARED).concat([{s:'17:00',m:TEAM.A.post.m,g:'move',ko:'🟦 '+TEAM.A.post.ko,en:'🟦 '+TEAM.A.post.en},{s:'17:00',m:TEAM.B.post.m,g:'move',ko:'🟧 '+TEAM.B.post.ko,en:'🟧 '+TEAM.B.post.en}]);
+    all.forEach(function(x){h+='<tr><td class="n" style="text-align:left">'+x.s+'</td><td><span class="dot '+TG[x.g].c+'"></span>'+T(x).replace('🟦 ','<span class="tag a">'+(lang==='ko'?'신림':'Sillim')+'</span>').replace('🟧 ','<span class="tag b">'+(lang==='ko'?'수원':'Suwon')+'</span>')+'</td><td class="n">'+hm(x.m)+'</td></tr>'});
+    document.getElementById('time-table').innerHTML=h;
+
+    // distance
+    function sum(f){var t=0;DIST.forEach(function(x){if(f(x))t+=x.km});return t}
+    var shared=sum(function(x){return x.who==='X'}),walk=sum(function(x){return x.g==='walk'});
+    var da=sum(function(x){return x.who!=='B'}),db=sum(function(x){return x.who!=='A'});
+    document.getElementById('dist-shared').textContent=km(shared);
+    var steps=Math.round(walk*1350/100)*100;
+    document.getElementById('dist-walk').textContent=lang==='ko'?('도보 '+km(walk)+' · 약 '+steps.toLocaleString('en-US')+'보'):('Walking '+km(walk)+' · about '+steps.toLocaleString('en-US')+' steps');
+    document.getElementById('dist-a').textContent=km(da);document.getElementById('dist-b').textContent=km(db);
+    document.getElementById('tab-dist').textContent=Math.round(da)+'/'+Math.round(db)+' km';
+    var ds={};DIST.forEach(function(x){if(x.who==='X')ds[x.g]=(ds[x.g]||0)+x.km});
+    var db2=document.getElementById('dist-bar'),dl=document.getElementById('dist-legend');db2.innerHTML='';dl.innerHTML='';
+    Object.keys(DG).forEach(function(k){var v=ds[k]||0;if(!v)return;var s=document.createElement('span');s.className=DG[k].c;s.style.width=(v/shared*100)+'%';db2.appendChild(s);
+      var l=document.createElement('span');l.innerHTML='<i class="'+DG[k].c+'"></i>'+T(DG[k])+' · '+km(v);dl.appendChild(l)});
+    h='<tr><th>'+(lang==='ko'?'구간':'Leg')+'</th><th>'+(lang==='ko'?'수단':'Mode')+'</th><th class="n">km</th></tr>';
+    DIST.forEach(function(x){var tag=x.who==='A'?'<span class="tag a">'+(lang==='ko'?'신림':'Sillim')+'</span>':x.who==='B'?'<span class="tag b">'+(lang==='ko'?'수원':'Suwon')+'</span>':'';
+      h+='<tr><td>'+tag+T(x)+'</td><td><span class="dot '+DG[x.g].c+'"></span>'+T(DG[x.g])+'</td><td class="n">'+x.km.toFixed(1)+'</td></tr>'});
+    h+='<tr class="sum"><td>'+(lang==='ko'?'함께 이동한 거리':'Together')+'</td><td></td><td class="n">'+shared.toFixed(1)+'</td></tr>';
+    document.getElementById('dist-table').innerHTML=h;
+    renderMap();
+  }
+
+  /* ---- map view ---- */
+  var KAKAO_KEY='856809adc99a02532a20ffdd68acdf22';
+  var PINS=[
+    {r:'N',n:'M',lat:37.5609,lng:126.9863,t:'13:00',ko:'명동역 3번 출구 (만나는 곳)',en:'Myeongdong Stn Exit 3 (meet here)',q:'명동역 3번출구',meet:true},
+    {r:'N',n:'1',lat:37.5578,lng:126.9827,t:'13:15',ko:'남산 케이블카 승강장',en:'Namsan Cable Car station',q:'남산케이블카'},
+    {r:'N',n:'2',lat:37.5512,lng:126.9882,t:'13:25',ko:'N서울타워',en:'N Seoul Tower',q:'N서울타워'},
+    {r:'N',n:'3',lat:37.5602,lng:126.9853,t:'14:50',ko:'다이소 명동역점',en:'Daiso Myeongdong Stn',q:'다이소 명동역점'},
+    {r:'S',n:'S',lat:37.5446,lng:127.0557,t:'16:00',ko:'성수역',en:'Seongsu Stn',q:'성수역',stn:true},
+    {r:'S',n:'4',lat:37.5437,lng:127.0536,t:'16:00',ko:'자연도소금빵',en:'Jayeondo salt bread',q:'자연도소금빵 성수'},
+    {r:'S',n:'5',lat:37.5449,lng:127.0581,t:'16:15',ko:'카페 어니언 성수',en:'Café Onion Seongsu',q:'어니언 성수'},
+    {r:'S',n:'6',lat:37.5432,lng:127.0560,t:'16:50',ko:'연무장길',en:'Yeonmujang-gil',q:'연무장길'}
+  ];
+  var ROUTE_A=[[37.4842,126.9297],[37.4806,126.9527],[37.4766,126.9816],[37.4870,126.9822],[37.5225,126.9740],[37.5299,126.9680],[37.5447,126.9721],[37.5530,126.9726],[37.5585,126.9781],[37.5609,126.9863]];
+  var ROUTE_B=[[37.2617,127.0315],[37.2664,126.9999],[37.3722,126.9435],[37.4019,126.9227],[37.4810,126.8828],[37.5156,126.9073],[37.5299,126.9648],[37.5547,126.9707],[37.5585,126.9781],[37.5609,126.9863]];
+  var ROUTE_X=[[37.5609,126.9863],[37.5612,126.9945],[37.5654,127.0079],[37.5658,127.0174],[37.5649,127.0294],[37.5612,127.0371],[37.5554,127.0436],[37.5476,127.0474],[37.5446,127.0557]];
+  var STN=[['신림','Sillim',37.4842,126.9297,'A'],['사당','Sadang',37.4766,126.9816,'A'],['수원시청','Suwon City Hall',37.2617,127.0315,'B'],['수원','Suwon',37.2664,126.9999,'B'],['서울역','Seoul Stn',37.5547,126.9707,'B'],['명동','Myeongdong',37.5609,126.9863,'X'],['성수','Seongsu',37.5446,127.0557,'X']];
+  var region='N', kmap=null, kState='idle';
+
+  function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+  function pinColor(p){return p.meet?css('--fg'):p.stn?css('--slate'):(p.r==='N'?css('--celadon'):css('--brick'))}
+
+  function svgFor(r){
+    var W=360,H=300,pad=34,pts=[];
+    if(r==='A'){pts=ROUTE_A.concat(ROUTE_B,ROUTE_X);H=470}
+    else{pts=PINS.filter(function(p){return p.r===r}).map(function(p){return [p.lat,p.lng]});H=r==='N'?320:240}
+    var la=pts.map(function(p){return p[0]}),ln=pts.map(function(p){return p[1]});
+    var minLa=Math.min.apply(0,la),maxLa=Math.max.apply(0,la),minLn=Math.min.apply(0,ln),maxLn=Math.max.apply(0,ln);
+    var k=Math.cos((minLa+maxLa)/2*Math.PI/180);
+    var s=Math.min((W-2*pad)/((maxLn-minLn)*k),(H-2*pad)/(maxLa-minLa));
+    var ox=(W-(maxLn-minLn)*k*s)/2,oy=(H-(maxLa-minLa)*s)/2;
+    function X(lng){return ox+(lng-minLn)*k*s} function Y(lat){return oy+(maxLa-lat)*s}
+    function poly(a){return a.map(function(p){return X(p[1]).toFixed(1)+','+Y(p[0]).toFixed(1)}).join(' ')}
+    var fg=css('--fg'),mu=css('--muted'),sf=css('--surface');
+    var o='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+(lang==='ko'?'위치 약도':'Location sketch map')+'">';
+    o+='<rect width="'+W+'" height="'+H+'" fill="'+sf+'"/>';
+    for(var gx=0;gx<W;gx+=30)o+='<line x1="'+gx+'" y1="0" x2="'+gx+'" y2="'+H+'" stroke="'+css('--line')+'" stroke-width=".5" opacity=".5"/>';
+    for(var gy=0;gy<H;gy+=30)o+='<line x1="0" y1="'+gy+'" x2="'+W+'" y2="'+gy+'" stroke="'+css('--line')+'" stroke-width=".5" opacity=".5"/>';
+    if(r==='A'){
+      [[ROUTE_A,'--team-a'],[ROUTE_B,'--team-b'],[ROUTE_X,'--together']].forEach(function(q){o+='<polyline points="'+poly(q[0])+'" fill="none" stroke="'+css(q[1])+'" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>'});
+      STN.forEach(function(st){var c=st[4]==='A'?css('--team-a'):st[4]==='B'?css('--team-b'):css('--together');var x=X(st[3]),y=Y(st[2]);
+        o+='<circle cx="'+x+'" cy="'+y+'" r="6" fill="'+sf+'" stroke="'+c+'" stroke-width="3"/>';
+        var right=(st[3]<126.99&&st[0]!=='신림'&&st[0]!=='서울역')||st[0]==='수원시청';var lbl=lang==='ko'?st[0]:st[1];
+        if(st[0]==='명동'){o+='<text x="'+(x-9)+'" y="'+(y-9)+'" font-size="12" font-weight="700" fill="'+fg+'" text-anchor="end">'+lbl+' 13:00</text>';return}
+        if(st[0]==='성수'){o+='<text x="'+x+'" y="'+(y+20)+'" font-size="12" font-weight="700" fill="'+fg+'" text-anchor="middle">'+lbl+' 17:00</text>';return}
+        o+='<text x="'+(x+(right?10:-10))+'" y="'+(y+4)+'" font-size="11.5" fill="'+fg+'" text-anchor="'+(right?'start':'end')+'">'+lbl+'</text>';
+      });
+      o+='<text x="'+(W/2)+'" y="'+(H-10)+'" font-size="11" fill="'+mu+'" text-anchor="middle">'+(lang==='ko'?'귀가는 각자 반대 방향 (신림: 2호선 · 수원: 수인분당선)':'Home: Sillim on Line 2 · Suwon on Suin–Bundang')+'</text>';
+    } else {
+      var ps=PINS.filter(function(p){return p.r===r});
+      var order=r==='N'?['M','1','2','1','3']:['S','4','6','5','S'];
+      o+='<polyline points="'+order.map(function(n){var p=ps.filter(function(q){return q.n===n})[0];return X(p.lng).toFixed(1)+','+Y(p.lat).toFixed(1)}).join(' ')+'" fill="none" stroke="'+fg+'" stroke-opacity=".5" stroke-width="2" stroke-dasharray="5 4"/>';
+      ps.forEach(function(p){var x=X(p.lng),y=Y(p.lat);
+        o+='<circle cx="'+x+'" cy="'+y+'" r="11" fill="'+pinColor(p)+'" stroke="'+sf+'" stroke-width="2.5"/>';
+        o+='<text x="'+x+'" y="'+(y+4)+'" font-size="11" font-weight="700" fill="'+sf+'" text-anchor="middle" font-family="IBM Plex Mono,monospace">'+(p.stn?'🚇':p.n)+'</text>';
+      });
+      var m=r==='S'?0.2:0.5,px=(m/111.32)*s;
+      o+='<line x1="16" y1="'+(H-16)+'" x2="'+(16+px)+'" y2="'+(H-16)+'" stroke="'+fg+'" stroke-width="2"/><text x="16" y="'+(H-22)+'" font-size="10" fill="'+mu+'">'+(m*1000)+' m</text>';
+    }
+    o+='<text x="'+(W-16)+'" y="24" font-size="12" font-weight="700" fill="'+mu+'" text-anchor="middle">N</text><path d="M'+(W-16)+' 28 l-4 9 h8 z" fill="'+mu+'"/>';
+    return o+'</svg>';
+  }
+  function renderPinList(){
+    var h='';
+    PINS.filter(function(p){return region==='A'||p.r===region}).forEach(function(p){
+      var q=encodeURIComponent(p.q),cls=p.meet?'M':p.stn?'T':(p.r==='N'?'W':'S');
+      h+='<li><span class="num '+cls+'">'+(p.stn?'🚇':p.n)+'</span><span style="min-width:0"><span class="t">'+p.t+'</span> '+T(p)+'</span>'+
+         '<span class="lk"><a href="https://map.naver.com/p/search/'+q+'" target="_blank" rel="noopener">N</a><a href="https://map.kakao.com/link/search/'+q+'" target="_blank" rel="noopener">K</a></span></li>';
+    });
+    document.getElementById('pinlist').innerHTML=h;
+  }
+  function setNote(){
+    document.getElementById('mapnote').textContent=kState==='ready'
+      ?(lang==='ko'?'카카오맵 · 핀을 누르면 장소 이름이 보여요.':'Kakao Map · tap a pin to see the place name.')
+      :(lang==='ko'?'이 화면에서는 카카오 지도를 불러올 수 없어 위치 약도로 보여드려요. 핀 위치는 대략적이며, N(네이버) · K(카카오) 버튼으로 정확한 위치를 열 수 있어요.':'The live Kakao map can\'t load on this page, so this is a sketch map. Pin positions are approximate; use the N (Naver) and K (Kakao) buttons for exact locations.');
+  }
+  function renderMap(){
+    if(document.getElementById('mapview').hidden)return;
+    document.querySelectorAll('.regions button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-r')===region)});
+    renderPinList();setNote();
+    if(kState==='ready'){fitKakao();return}
+    document.getElementById('kmap').hidden=true;
+    document.getElementById('svgmap').innerHTML=svgFor(region);
+  }
+  function loadKakao(){
+    if(kState!=='idle')return;kState='loading';
+    var done=false,timer=setTimeout(function(){if(!done){done=true;kState='failed';renderMap()}},9000);
+    var s=document.createElement('script');
+    s.src='https://dapi.kakao.com/v2/maps/sdk.js?appkey='+KAKAO_KEY+'&autoload=false';
+    s.onerror=function(){if(done)return;done=true;clearTimeout(timer);kState='failed';renderMap()};
+    s.onload=function(){try{window.kakao.maps.load(function(){if(done)return;done=true;clearTimeout(timer);kState='ready';buildKakao();renderMap()})}catch(e){if(!done){done=true;clearTimeout(timer);kState='failed';renderMap()}}};
+    document.head.appendChild(s);
+  }
+  function buildKakao(){
+    var km=window.kakao.maps,box=document.getElementById('kmap');box.hidden=false;document.getElementById('svgmap').innerHTML='';
+    kmap=new km.Map(box,{center:new km.LatLng(37.45,126.98),level:10});
+    function pl(a,col,dash){new km.Polyline({map:kmap,path:a.map(function(p){return new km.LatLng(p[0],p[1])}),strokeWeight:4,strokeColor:col,strokeOpacity:.85,strokeStyle:dash?'shortdash':'solid'})}
+    pl(ROUTE_A,css('--team-a'));pl(ROUTE_B,css('--team-b'));pl(ROUTE_X,css('--together'));
+    PINS.forEach(function(p){
+      var d=document.createElement('div');d.className='kpin';d.style.background=pinColor(p);d.textContent=p.stn?'🚇':p.n;d.title=T(p);
+      d.addEventListener('click',function(){new km.InfoWindow({position:new km.LatLng(p.lat,p.lng),content:'<div style="padding:6px 10px;font-size:13px;color:#222;white-space:nowrap">'+p.t+' '+T(p)+'</div>',removable:true}).open(kmap)});
+      new km.CustomOverlay({map:kmap,position:new km.LatLng(p.lat,p.lng),content:d,yAnchor:.5});
+    });
+  }
+  function fitKakao(){
+    var km=window.kakao.maps,b=new km.LatLngBounds();
+    var pts=region==='A'?ROUTE_A.concat(ROUTE_B,ROUTE_X):PINS.filter(function(p){return p.r===region}).map(function(p){return [p.lat,p.lng]});
+    pts.forEach(function(p){b.extend(new km.LatLng(p[0],p[1]))});
+    kmap.relayout();kmap.setBounds(b,40,40,40,40);
+  }
+  var vl=document.getElementById('v-list'),vm=document.getElementById('v-map');
+  function setView(v){var map=v==='map';vl.setAttribute('aria-pressed',!map);vm.setAttribute('aria-pressed',map);
+    document.getElementById('listview').hidden=map;document.getElementById('mapview').hidden=!map;
+    if(map){loadKakao();renderMap()} try{localStorage.setItem('view',v)}catch(e){}}
+  vl.addEventListener('click',function(){setView('list')});vm.addEventListener('click',function(){setView('map')});
+  document.querySelectorAll('.regions button').forEach(function(b){b.addEventListener('click',function(){region=b.getAttribute('data-r');renderMap()})});
+
+  /* ---- tabs & controls ---- */
+  var tabs=[].slice.call(document.querySelectorAll('[role=tab]'));
+  function show(id){tabs.forEach(function(t){var sel=t.getAttribute('aria-controls')===id;t.setAttribute('aria-selected',sel);document.getElementById(t.getAttribute('aria-controls')).hidden=!sel});
+    try{localStorage.setItem('tab',id)}catch(e){}}
+  tabs.forEach(function(t){t.addEventListener('click',function(){show(t.getAttribute('aria-controls'))})});
+  var bko=document.getElementById('btn-ko'),ben=document.getElementById('btn-en');
+  function setLang(l){lang=l;app.setAttribute('data-lang',l);document.documentElement.lang=l;bko.setAttribute('aria-pressed',l==='ko');ben.setAttribute('aria-pressed',l==='en');try{localStorage.setItem('lang',l)}catch(e){}render()}
+  bko.addEventListener('click',function(){setLang('ko')});ben.addEventListener('click',function(){setLang('en')});
+  document.getElementById('am').addEventListener('click',function(){if(nA>0&&nA+nB>1){nA--;render()}});
+  document.getElementById('ap').addEventListener('click',function(){if(nA<20){nA++;render()}});
+  document.getElementById('bm').addEventListener('click',function(){if(nB>0&&nA+nB>1){nB--;render()}});
+  document.getElementById('bp').addEventListener('click',function(){if(nB<20){nB++;render()}});
+  document.getElementById('obs').addEventListener('change',function(e){obs=e.target.checked;render()});
+  document.getElementById('lock').addEventListener('change',function(e){lock=e.target.checked;render()});
+  document.getElementById('shop').addEventListener('input',function(e){var v=parseInt(e.target.value,10);shop=isNaN(v)||v<0?0:v;render()});
+
+  var sl=null,st=null,sv=null;try{sl=localStorage.getItem('lang');st=localStorage.getItem('tab');sv=localStorage.getItem('view')}catch(e){}
+  if(sv==='map')setView('map');
+  var hash=(location.hash||'').slice(1),ids=['plan','cost','time','dist'];
+  if(sl==='en'||sl==='ko')lang=sl;
+  setLang(lang);
+  show(ids.indexOf(hash)>-1?hash:(ids.indexOf(st)>-1?st:'plan'));
+})();
+</script>
+</body>
+</html>
