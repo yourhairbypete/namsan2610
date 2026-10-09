@@ -173,6 +173,23 @@ table.acts .n{text-align:right;font-family:var(--mono);font-variant-numeric:tabu
 .pinlist .num.M{background:var(--fg)}
 .c-transit{background:var(--slate)} .c-entry{background:var(--celadon)} .c-food{background:var(--brick)} .c-other{background:var(--ochre)}
 .c-shop{background:var(--ochre)}
+.showmap{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--fg);background:var(--fg);color:var(--bg);border-radius:6px;padding:4px 10px;cursor:pointer}
+h3.golink{cursor:pointer;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px;text-decoration-thickness:2px}
+h3.golink:hover{text-decoration-color:currentColor}
+h3.golink:focus-visible{outline:2px solid var(--celadon);outline-offset:2px;border-radius:4px}
+.pinlist li{cursor:pointer}
+.pinlist li.on{border-color:var(--fg);box-shadow:0 0 0 1px var(--fg)}
+#mapview{scroll-margin-top:72px}
+.transit.ta{border-color:var(--team-a)} .transit.tb{border-color:var(--team-b)}
+.transit+.transit{margin-top:10px}
+.transit .who{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px}
+.transit.ta .who{color:var(--team-a)} .transit.tb .who{color:var(--team-b)}
+.transit .who i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.z0 h2{color:var(--fg)} .zone.z0{margin-bottom:-8px}
+.big2 .pp b{font-size:32px;line-height:1.15}
+.big2 .bar{margin:6px 0 2px;height:8px}
+td.na{color:var(--muted)}
+th.th-a{color:var(--team-a)} th.th-b{color:var(--team-b)}
 footer{margin-top:18px;font-size:12px;color:var(--muted)}
 [data-lang="en"] .ko,[data-lang="ko"] .en{display:none}
 @media (max-width:420px){.tabs button{font-size:13px}}
@@ -228,59 +245,40 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
 
   <div id="listview">
 
-  <h2 class="sect"><span class="ko">출발 · 1시까지 명동역</span><span class="en">Getting there · Myeongdong Stn by 1pm</span></h2>
-  <div class="teams">
-    <div class="team t-sillim">
-      <div class="tname"><span class="ko">신림 팀</span><span class="en">Sillim group</span><span class="fare">₩1,750</span></div>
-      <div class="dep"><b>12:15</b> <span class="ko">신림역 출발</span><span class="en">leave Sillim Stn</span> → <b>~12:52</b> <span class="ko">명동역</span><span class="en">Myeongdong</span></div>
-      <ol class="steps">
-        <li><span class="ln l2">2</span><span class="ko">2호선 <b>사당 방면</b> 4정거장 → 사당 하차</span><span class="en">Line 2 toward <b>Sadang</b>, 4 stops</span></li>
-        <li><span class="ln l4">4</span><span class="ko">4호선 <b>당고개·진접 방면</b> 환승 → 10정거장 → 명동 하차</span><span class="en">Change to Line 4 toward <b>Danggogae/Jinjeop</b>, 10 stops to Myeongdong</span></li>
-      </ol>
-      <div class="meta"><span>~37 min</span><span class="ko">환승 1회</span><span class="en">1 transfer</span></div>
-    </div>
-    <div class="team t-suwon">
-      <div class="tname"><span class="ko">수원 팀</span><span class="en">Suwon group</span><span class="fare">₩2,350</span></div>
-      <div class="dep"><b>11:20</b> <span class="ko">수원시청역 출발</span><span class="en">leave Suwon City Hall Stn</span> → <b>~12:50</b> <span class="ko">명동역</span><span class="en">Myeongdong</span></div>
-      <ol class="steps">
-        <li><span class="ln lsb">수</span><span class="ko">수인분당선 <b>인천 방면</b> 2정거장 → 수원 하차</span><span class="en">Suin–Bundang toward <b>Incheon</b>, 2 stops to Suwon</span></li>
-        <li><span class="ln l1">1</span><span class="ko">1호선 <b>서울역·청량리 방면</b> 환승 (급행이면 더 빠름) → 서울역 하차</span><span class="en">Change to Line 1 toward <b>Seoul Stn/Cheongnyangni</b> (express is faster), get off at Seoul Stn</span></li>
-        <li><span class="ln l4">4</span><span class="ko">4호선 <b>당고개·진접 방면</b> 환승 → 2정거장 → 명동 하차</span><span class="en">Change to Line 4 toward <b>Danggogae/Jinjeop</b>, 2 stops to Myeongdong</span></li>
-      </ol>
-      <div class="meta"><span>~90 min</span><span class="ko">환승 2회</span><span class="en">2 transfers</span></div>
-    </div>
+  <div class="transit ta">
+    <div class="who"><i class="c-sillim"></i><span class="ko">신림 팀</span><span class="en">Sillim group</span></div>
+    <div class="row ko"><span>12:15 신림역</span><span>→</span><span>사당 환승</span><span>→</span><span>~12:52 명동역</span></div>
+    <div class="row en"><span>12:15 Sillim</span><span>→</span><span>change at Sadang</span><span>→</span><span>~12:52 Myeongdong</span></div>
+    <strong class="ko">2호선 사당 방면 4정거장 → 4호선 당고개·진접 방면 10정거장, 약 37분 · ₩1,750</strong>
+    <strong class="en">Line 2 toward Sadang, 4 stops → Line 4 toward Danggogae/Jinjeop, 10 stops, ~37 min · ₩1,750</strong>
   </div>
-
-  <div class="meetup">
-    <div class="mt">13:00</div>
-    <div>
-      <strong class="ko">만나는 곳 · 명동역 (4호선) 3번 출구 앞</strong>
-      <strong class="en">Meet · outside Myeongdong Stn (Line 4) Exit 3</strong>
-      <p class="ko">케이블카 승강장 쪽으로 가장 가까운 출구예요. 먼저 도착한 팀은 개찰구 안에서 기다리지 말고 3번 출구 계단 위에서 기다리기.</p>
-      <p class="en">This is the exit closest to the cable car. Whoever arrives first waits at the top of the Exit 3 stairs, not inside the gates.</p>
-      <div class="maps" data-q="명동역 3번출구"></div>
-    </div>
+  <div class="transit tb">
+    <div class="who"><i class="c-suwon"></i><span class="ko">수원 팀</span><span class="en">Suwon group</span></div>
+    <div class="row ko"><span>11:20 수원시청역</span><span>→</span><span>수원 · 서울역 환승</span><span>→</span><span>~12:50 명동역</span></div>
+    <div class="row en"><span>11:20 Suwon City Hall</span><span>→</span><span>change at Suwon, Seoul Stn</span><span>→</span><span>~12:50 Myeongdong</span></div>
+    <strong class="ko">수인분당선 인천 방면 2정거장 → 1호선 서울역·청량리 방면 (급행이면 더 빠름) → 4호선 당고개·진접 방면 2정거장, 약 90분 · ₩2,350</strong>
+    <strong class="en">Suin–Bundang toward Incheon, 2 stops → Line 1 toward Seoul Stn/Cheongnyangni (express is faster) → Line 4 toward Danggogae/Jinjeop, 2 stops, ~90 min · ₩2,350</strong>
   </div>
 
   <div class="zone z2">
-    <h2><span class="ko">남산서울타워</span><span class="en">N Seoul Tower</span><small>13:00–14:40</small></h2>
+    <h2><span class="ko">남산서울타워</span><span class="en">N Seoul Tower</span><small>13:00–14:50</small></h2>
     <ol>
-      <li class="stop"><div class="time">13:00</div><div class="card">
-        <h3 class="ko">명동역 → 남산 케이블카 승강장 (도보)</h3><h3 class="en">Myeongdong Stn → Namsan Cable Car (walk)</h3>
-        <p class="ko">3번 출구에서 오르막 약 10분. 중간의 무료 경사형 엘리베이터 '남산오르미'를 타면 덜 힘들어요.</p>
-        <p class="en">About 10 minutes uphill from Exit 3. The free inclined elevator "Namsan Oreumi" on the way saves the steepest part.</p>
-        <div class="meta"><span>~15 min</span><span class="ko">무료</span><span class="en">Free</span></div>
-        <div class="maps" data-q="남산케이블카"></div>
+      <li class="stop"><div class="time">13:00</div><div class="card" data-pin="M">
+        <h3 class="ko">명동역 (4호선) 3번 출구 앞 집합</h3><h3 class="en">Meet outside Myeongdong Stn (Line 4) Exit 3</h3>
+        <p class="ko">먼저 도착한 팀은 개찰구 안이 아니라 3번 출구 계단 위에서 기다리기. 모이면 남산순환버스 출발점인 남산예장 정류장까지 걸어서 3분.</p>
+        <p class="en">Whoever arrives first waits at the top of the Exit 3 stairs, not inside the gates. Then walk 3 minutes to the Namsan Yejang stop, where the Namsan buses start.</p>
+        <div class="meta"><span>~5 min</span></div>
+        <div class="maps" data-q="명동역 3번출구"></div>
       </div></li>
 
-      <li class="stop"><div class="time">13:15</div><div class="card">
-        <h3 class="ko">남산 케이블카 (왕복)</h3><h3 class="en">Namsan Cable Car (round trip)</h3>
-        <p class="ko">약 10분 간격 운행, 매일 10:00–23:00. 내려올 때도 타니 왕복권으로 구매.</p>
-        <p class="en">Runs about every 10 minutes, daily 10:00–23:00. Buy a round-trip ticket since you'll ride back down.</p>
-        <div class="meta"><span class="ko">성인 왕복 15,000원</span><span class="en">Adult round trip ₩15,000</span><span class="ko">편도 12,000원</span><span class="en">One way ₩12,000</span></div>
+      <li class="stop"><div class="time">13:05</div><div class="card" data-pin="1">
+        <h3 class="ko">남산순환버스 01A · 01B → 남산서울타워</h3><h3 class="en">Namsan circular bus 01A or 01B → N Seoul Tower</h3>
+        <p class="ko">남산예장 정류장에서 탑승. 둘 다 타워에 가요. 01A가 6–9분, 01B가 15–18분 간격이라 먼저 오는 버스 탑승. '남산서울타워' 정류장에서 하차, 약 20분. 매일 06:30–23:00.</p>
+        <p class="en">Board at the Namsan Yejang stop. Both go to the tower. 01A runs every 6–9 min and 01B every 15–18 min, so take whichever comes first. Get off at "Namsan Seoul Tower", about 20 min. Daily 06:30–23:00.</p>
+        <div class="meta"><span class="ko">교통카드 약 ₩1,400</span><span class="en">About ₩1,400 by card</span><span class="ko">지하철 하차 30분 내 환승 할인</span><span class="en">Transfer discount within 30 min of the subway</span></div>
       </div></li>
 
-      <li class="stop"><div class="time">13:25</div><div class="card">
+      <li class="stop"><div class="time">13:25</div><div class="card" data-pin="2">
         <h3 class="ko">N서울타워에서 할 것</h3><h3 class="en">Things to do at N Seoul Tower</h3>
         <table class="acts">
           <tr><td><b class="ko">타워 광장 · 서울 전망</b><b class="en">Tower plaza · city views</b><small class="ko">광장과 팔각정에서 서울 시내가 한눈에</small><small class="en">Wide views from the plaza and Palgakjeong pavilion</small></td><td class="n ko">무료</td><td class="n en">Free</td></tr>
@@ -292,11 +290,11 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
         <div class="maps" data-q="N서울타워"></div>
       </div></li>
 
-      <li class="stop"><div class="time">14:30</div><div class="card">
-        <h3 class="ko">케이블카로 하산 → 다이소까지 도보</h3><h3 class="en">Cable car down → walk to Daiso</h3>
-        <p class="ko">승강장에서 명동역 방향으로 다시 걸어 내려가요.</p>
-        <p class="en">Walk back down toward Myeongdong Station from the lower cable car station.</p>
-        <div class="meta"><span>~20 min</span></div>
+      <li class="stop"><div class="time">14:30</div><div class="card" data-pin="1">
+        <h3 class="ko">01B 버스로 하산 → 남산예장 하차 → 다이소</h3><h3 class="en">Bus 01B down → get off at Namsan Yejang → Daiso</h3>
+        <p class="ko">타워 정류장에서 <b>01B</b>를 타면 남산도서관을 거쳐 출발했던 남산예장 정류장으로 돌아와요 (01A는 남대문시장·경복궁 쪽으로 돌아서 멀어요). 내려서 명동역 쪽 다이소까지 걸어서 5분.</p>
+        <p class="en">From the tower stop, take <b>01B</b>; it loops back via Namsan Library to the Yejang stop where you started (01A goes the long way via Namdaemun and Gyeongbokgung). Then a 5-minute walk to Daiso by Myeongdong Station.</p>
+        <div class="meta"><span>~20 min</span><span class="ko">약 ₩1,400</span><span class="en">About ₩1,400</span></div>
       </div></li>
     </ol>
   </div>
@@ -304,7 +302,7 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
   <div class="zone z3">
     <h2><span class="ko">명동</span><span class="en">Myeongdong</span><small>14:50–15:30</small></h2>
     <ol>
-      <li class="stop"><div class="time">14:50</div><div class="card">
+      <li class="stop"><div class="time">14:50</div><div class="card" data-pin="3">
         <h3 class="ko">다이소 명동역점 (12층) · 뷰티 쇼핑 40분</h3><h3 class="en">Daiso Myeongdong Station branch (12 floors) · 40 min beauty shopping</h3>
         <p class="ko">퇴계로 134-1, 명동역 바로 앞. 매일 10:00–22:00. 뷰티 코너는 저층(2층으로 소개됨)에 있어요. 층 구성은 바뀔 수 있으니 입구 층별 안내 확인.</p>
         <p class="en">Toegye-ro 134-1, right by Myeongdong Station. Open daily 10:00–22:00. Beauty is on a lower floor (reported as 2F); check the floor guide at the entrance as layouts change.</p>
@@ -332,7 +330,7 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
   <div class="zone z1">
     <h2><span class="ko">성수</span><span class="en">Seongsu</span><small>16:00–17:00</small></h2>
     <ol>
-      <li class="stop"><div class="time">16:00</div><div class="card">
+      <li class="stop"><div class="time">16:00</div><div class="card" data-pin="4">
         <h3 class="ko">자연도소금빵 in 성수 (포장)</h3><h3 class="en">Jayeondo Salt Bread in Seongsu (takeout)</h3>
         <p class="ko">성수 대표 소금빵집. 4개 단위로만 판매, 키오스크 결제 후 픽업. 매장 좌석이 없어 포장해서 카페로. 오후 굽는 시간은 15:30, 17:00쯤이라는 후기가 많아요.</p>
         <p class="en">Seongsu's best-known salt bread shop. Sold only in sets of four; pay at the kiosk, then pick up. No seating, so take it to the café. Reviewers mention afternoon bakes around 15:30 and 17:00.</p>
@@ -340,7 +338,7 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
         <div class="maps" data-q="자연도소금빵 성수"></div>
       </div></li>
 
-      <li class="stop"><div class="time">16:15</div><div class="card">
+      <li class="stop"><div class="time">16:15</div><div class="card" data-pin="5">
         <h3 class="ko">카페 어니언 성수</h3><h3 class="en">Café Onion Seongsu</h3>
         <p class="ko">옛 공장을 개조한 성수 대표 카페. 슈가파우더 듬뿍 올린 팡도르가 시그니처. 여기에도 소금빵이 있어서 비교해 먹어보기 좋아요.</p>
         <p class="en">The converted-factory café that defines Seongsu. The pandoro under a snowdrift of powdered sugar is the signature. They also sell salt bread, so you can compare.</p>
@@ -354,7 +352,7 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
         <div class="maps" data-q="어니언 성수"></div>
       </div></li>
 
-      <li class="stop"><div class="time">16:50</div><div class="card">
+      <li class="stop"><div class="time">16:50</div><div class="card" data-pin="6">
         <h3 class="ko">연무장길 팝업 구경 → 성수역</h3><h3 class="en">Yeonmujang-gil pop-ups → Seongsu Stn</h3>
         <p class="ko">시간이 남으면 연무장길 팝업스토어를 가볍게 구경하고 성수역에서 해산. 팝업은 매주 바뀌니 당일 인스타그램 확인.</p>
         <p class="en">If time allows, browse the Yeonmujang-gil pop-up stores, then split up at Seongsu Station. Pop-ups change weekly; check Instagram on the day.</p>
@@ -364,39 +362,39 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
     </ol>
   </div>
 
-  <h2 class="sect"><span class="ko">귀가 · 17:00 성수역에서 해산</span><span class="en">Going home · split at Seongsu Stn, 17:00</span></h2>
-  <div class="teams">
-    <div class="team t-sillim">
-      <div class="tname"><span class="ko">신림 팀 → 신림역</span><span class="en">Sillim group → Sillim Stn</span><span class="fare">₩1,950</span></div>
-      <div class="dep"><b>17:00</b> <span class="ko">성수역</span><span class="en">Seongsu</span> → <b>~17:45</b> <span class="ko">신림역</span><span class="en">Sillim</span></div>
-      <ol class="steps">
-        <li><span class="ln l2">2</span><span class="ko">2호선 <b>건대입구·잠실 방면</b> 19정거장 → 신림 하차 (환승 없음)</span><span class="en">Line 2 toward <b>Konkuk Univ./Jamsil</b>, 19 stops to Sillim, no transfer</span></li>
-      </ol>
-      <div class="meta"><span>~45 min</span><span class="ko">퇴근길이라 붐빔</span><span class="en">Rush hour</span></div>
-    </div>
-    <div class="team t-suwon">
-      <div class="tname"><span class="ko">수원 팀 → 수원역</span><span class="en">Suwon group → Suwon Stn</span><span class="fare">₩2,450</span></div>
-      <div class="dep"><b>17:00</b> <span class="ko">성수역</span><span class="en">Seongsu</span> → <b>~18:35</b> <span class="ko">수원역</span><span class="en">Suwon</span></div>
-      <ol class="steps">
-        <li><span class="ln l2">2</span><span class="ko">2호선 <b>왕십리 방면</b> 3정거장 → 왕십리 하차</span><span class="en">Line 2 toward <b>Wangsimni</b>, 3 stops</span></li>
-        <li><span class="ln lsb">수</span><span class="ko">수인분당선 <b>수원·인천 방면</b> 환승 → 수원 하차</span><span class="en">Change to Suin–Bundang toward <b>Suwon/Incheon</b>, get off at Suwon</span></li>
-      </ol>
-      <div class="meta"><span>~95 min</span><span class="ko">환승 1회</span><span class="en">1 transfer</span></div>
-    </div>
+  <div class="zone z0">
+    <h2><span class="ko">귀가</span><span class="en">Going home</span><small>17:00</small></h2>
+  </div>
+  <div class="transit ta">
+    <div class="who"><i class="c-sillim"></i><span class="ko">신림 팀 → 신림역</span><span class="en">Sillim group → Sillim Stn</span></div>
+    <div class="row ko"><span>17:00 성수역</span><span>→</span><span>~17:45 신림역</span></div>
+    <div class="row en"><span>17:00 Seongsu</span><span>→</span><span>~17:45 Sillim</span></div>
+    <strong class="ko">2호선 건대입구·잠실 방면 19정거장, 환승 없음, 약 45분 · ₩1,950</strong>
+    <strong class="en">Line 2 toward Konkuk Univ./Jamsil, 19 stops, no transfer, ~45 min · ₩1,950</strong>
+    <p class="ko">퇴근 시간이라 붐벼요.</p><p class="en">Rush hour, so expect crowds.</p>
+  </div>
+  <div class="transit tb">
+    <div class="who"><i class="c-suwon"></i><span class="ko">수원 팀 → 수원역</span><span class="en">Suwon group → Suwon Stn</span></div>
+    <div class="row ko"><span>17:00 성수역</span><span>→</span><span>왕십리 환승</span><span>→</span><span>~18:35 수원역</span></div>
+    <div class="row en"><span>17:00 Seongsu</span><span>→</span><span>change at Wangsimni</span><span>→</span><span>~18:35 Suwon</span></div>
+    <strong class="ko">2호선 왕십리 방면 3정거장 → 수인분당선 수원·인천 방면, 약 95분 · ₩2,450</strong>
+    <strong class="en">Line 2 toward Wangsimni, 3 stops → Suin–Bundang toward Suwon/Incheon, ~95 min · ₩2,450</strong>
   </div>
 
   <section class="notes">
     <h2 class="ko">출발 전 체크</h2><h2 class="en">Before you go</h2>
     <ul class="ko">
-      <li>남산은 오르막이 많아요. 편한 신발 필수.</li>
+      <li>버스는 교통카드(티머니·기후동행카드)로 타요. 현금은 더 비싸요.</li>
+      <li>타워 광장은 오르막이 있어요. 편한 신발 추천.</li>
       <li>사랑의 자물쇠를 걸 거라면 다이소에서 미리 사서 가면 저렴해요. 다이소는 타워 다음 일정이니 집 근처에서 준비.</li>
-      <li>케이블카는 주말 오후에 줄이 길어요. 대안은 충무로역에서 남산순환버스 01A·01B (₩1,400대, 6–18분 간격).</li>
+      <li>남산순환버스는 11–15시에 붐벼요. 줄이 길면 한 대 보내고 다음 버스를 타거나, 충무로역 2번 출구 정류장에서도 같은 버스를 탈 수 있어요.</li>
       <li>요금은 교통카드 성인 기준 추정치예요. 당일 네이버·카카오맵으로 다시 확인하세요.</li>
     </ul>
     <ul class="en">
-      <li>Namsan is steep; wear comfortable shoes.</li>
+      <li>Pay the bus with a transit card (T-money or Climate Card); cash costs more.</li>
+      <li>The tower plaza has slopes; wear comfortable shoes.</li>
       <li>If you want a love lock, bring one from home. It's cheaper than buying at the tower, and Daiso comes after the tower in this plan.</li>
-      <li>Cable car lines get long on weekend afternoons. The backup is the Namsan circular bus 01A/01B from Chungmuro Station (about ₩1,400, every 6–18 min).</li>
+      <li>The Namsan buses are busiest 11:00–15:00. If the line is long, wait for the next bus; the same buses also stop at Chungmuro Station Exit 2.</li>
       <li>Fares are adult transit-card estimates. Recheck on Naver or Kakao Map on the day.</li>
     </ul>
   </section>
@@ -405,30 +403,21 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
 
 <!-- COST -->
 <section class="panel" id="cost" role="tabpanel" aria-labelledby="t-cost" hidden>
-  <div class="total">
-    <span class="label ko">두 팀 예상 총 경비</span><span class="label en">Expected total, both groups</span>
-    <span class="big" id="cost-total">–</span>
-    <span class="small" id="cost-per">–</span>
+  <div class="total"><span class="label ko">1인 예상 경비</span><span class="label en">Expected cost per person</span></div>
+  <div class="cards2 big2">
+    <div class="pp t-sillim"><span class="ko">신림 팀 (1인)</span><span class="en">Sillim group (1 person)</span><b id="per-a">–</b><div class="bar" id="bar-a"></div></div>
+    <div class="pp t-suwon"><span class="ko">수원 팀 (1인)</span><span class="en">Suwon group (1 person)</span><b id="per-b">–</b><div class="bar" id="bar-b"></div></div>
   </div>
+  <div class="legend" id="cost-legend"></div>
   <div class="controls">
-    <div class="stepper"><span class="sw c-sillim"></span><span class="ko">신림 팀</span><span class="en">Sillim</span>
-      <button id="am" aria-label="Fewer people in Sillim group">−</button><output id="an" aria-live="polite">2</output><button id="ap" aria-label="More people in Sillim group">+</button></div>
-    <div class="stepper"><span class="sw c-suwon"></span><span class="ko">수원 팀</span><span class="en">Suwon</span>
-      <button id="bm" aria-label="Fewer people in Suwon group">−</button><output id="bn" aria-live="polite">2</output><button id="bp" aria-label="More people in Suwon group">+</button></div>
     <label class="opt" for="obs"><input type="checkbox" id="obs"><span class="ko">전망대 입장 포함 (₩29,000)</span><span class="en">Include the observatory (₩29,000)</span></label>
-    <label class="opt" for="lock"><input type="checkbox" id="lock"><span class="ko">사랑의 자물쇠 현장 구매 (팀당 1개, 약 ₩10,000)</span><span class="en">Buy a love lock on site (1 per group, ~₩10,000)</span></label>
-    <label class="opt budget" for="shop"><span class="ko">다이소 쇼핑 예산 (1인)</span><span class="en">Daiso budget per person</span>
+    <label class="opt" for="lock"><input type="checkbox" id="lock"><span class="ko">사랑의 자물쇠 현장 구매 (약 ₩10,000, 2명이 나눠 내기)</span><span class="en">Buy a love lock on site (~₩10,000, two people share)</span></label>
+    <label class="opt budget" for="shop"><span class="ko">다이소 쇼핑 예산 (신림 팀 1인)</span><span class="en">Daiso budget (Sillim, per person)</span>
       <span class="money">₩<input type="number" id="shop" min="0" step="1000" value="20000" inputmode="numeric"></span></label>
   </div>
-  <div class="cards2">
-    <div class="pp t-sillim"><span class="ko">신림 팀 1인</span><span class="en">Sillim, each</span><b id="per-a">–</b></div>
-    <div class="pp t-suwon"><span class="ko">수원 팀 1인</span><span class="en">Suwon, each</span><b id="per-b">–</b></div>
-  </div>
-  <div class="bar" id="cost-bar"></div>
-  <div class="legend" id="cost-legend"></div>
   <div class="ledger"><table id="cost-table"></table></div>
-  <p class="foot ko">교통비는 교통카드 성인 기준 추정치(기본 1,550원 + 거리 추가). 소금빵은 4개 세트를 2명이 나누는 기준(1인 ₩6,000). 쇼핑 예산은 직접 바꿀 수 있어요.</p>
-  <p class="foot en">Fares are adult transit-card estimates (₩1,550 base plus distance). Salt bread assumes two people share a set of four (₩6,000 each). You can change the shopping budget.</p>
+  <p class="foot ko">교통비는 교통카드 성인 기준 추정치(지하철 기본 1,550원 + 거리 추가, 남산순환버스 약 1,400원). 소금빵은 4개 세트를 2명이 나누는 기준. 다이소 쇼핑은 신림 팀만 포함했어요.</p>
+  <p class="foot en">Fares are adult transit-card estimates (subway ₩1,550 base plus distance; Namsan bus about ₩1,400). Salt bread assumes two people share a set of four. Daiso shopping is counted for the Sillim group only.</p>
 </section>
 
 <!-- TIME -->
@@ -442,8 +431,8 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
   <div class="tl"><div class="tlname"><span class="sw c-suwon"></span><span class="ko">수원 팀</span><span class="en">Suwon</span> <b id="tb">–</b></div><div class="track" id="tl-b"></div><div class="ticks" id="tk-b"></div></div>
   <div class="legend" id="time-legend"></div>
   <div class="ledger"><table id="time-table"></table></div>
-  <p class="foot ko">케이블카 대기와 소금빵 줄에 따라 15–30분 늘어날 수 있어요.</p>
-  <p class="foot en">Cable car and salt bread queues can add 15–30 minutes.</p>
+  <p class="foot ko">버스 대기와 소금빵 줄에 따라 15–30분 늘어날 수 있어요.</p>
+  <p class="foot en">Bus and salt bread queues can add 15–30 minutes.</p>
 </section>
 
 <!-- DISTANCE -->
@@ -471,32 +460,33 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
 <script>
 (function(){
   var app=document.getElementById('app');
-  var lang='ko', nA=2, nB=2, obs=false, lock=false, shop=20000;
+  var lang='ko', obs=false, lock=false, shop=20000;
 
   /* ---- cost data (per person unless noted) ---- */
   // who: 'A' Sillim only, 'B' Suwon only, 'X' everyone; per:'group' = once per group
+  // a = Sillim group, b = Suwon group, per person; null = not for that group
   var COST=[
-    {g:'transit',who:'A',ko:'신림역 → 명동역',en:'Sillim → Myeongdong',v:1750},
-    {g:'transit',who:'B',ko:'수원시청역 → 명동역',en:'Suwon City Hall → Myeongdong',v:2350},
-    {g:'transit',who:'X',ko:'남산 케이블카 왕복',en:'Namsan Cable Car round trip',v:15000},
-    {g:'transit',who:'X',ko:'명동역 → 성수역',en:'Myeongdong → Seongsu',v:1550},
-    {g:'transit',who:'A',ko:'성수역 → 신림역',en:'Seongsu → Sillim',v:1950},
-    {g:'transit',who:'B',ko:'성수역 → 수원역',en:'Seongsu → Suwon Stn',v:2450},
-    {g:'entry',who:'X',ko:'N서울타워 전망대',en:'N Seoul Tower observatory',v:29000,flag:'obs'},
-    {g:'entry',who:'G',ko:'사랑의 자물쇠 (팀당 1개)',en:'Love lock (1 per group)',v:10000,flag:'lock'},
-    {g:'food',who:'X',ko:'타워 간식',en:'Snack at the tower',v:5000},
-    {g:'food',who:'X',ko:'자연도소금빵 (4개 세트 ÷ 2명)',en:'Jayeondo salt bread (set of 4 ÷ 2)',v:6000},
-    {g:'food',who:'X',ko:'어니언 · 음료 + 팡도르',en:'Onion · drink + pandoro',v:11500},
-    {g:'shop',who:'X',ko:'다이소 뷰티 쇼핑',en:'Daiso beauty shopping',v:0,shop:true}
+    {g:'transit',ko:'신림역 → 명동역',en:'Sillim → Myeongdong',a:1750,b:null},
+    {g:'transit',ko:'수원시청역 → 명동역',en:'Suwon City Hall → Myeongdong',a:null,b:2350},
+    {g:'transit',ko:'남산순환버스 상행',en:'Namsan bus up',a:1400,b:1400},
+    {g:'transit',ko:'남산순환버스 하행 (01B)',en:'Namsan bus down (01B)',a:1400,b:1400},
+    {g:'transit',ko:'명동역 → 성수역',en:'Myeongdong → Seongsu',a:1550,b:1550},
+    {g:'transit',ko:'성수역 → 신림역',en:'Seongsu → Sillim',a:1950,b:null},
+    {g:'transit',ko:'성수역 → 수원역',en:'Seongsu → Suwon Stn',a:null,b:2450},
+    {g:'entry',ko:'N서울타워 전망대',en:'N Seoul Tower observatory',a:29000,b:29000,flag:'obs'},
+    {g:'entry',ko:'사랑의 자물쇠 (2명이 1개 나눠 내기)',en:'Love lock (two people share one)',a:5000,b:5000,flag:'lock'},
+    {g:'food',ko:'타워 간식',en:'Snack at the tower',a:5000,b:5000},
+    {g:'food',ko:'자연도소금빵 (4개 세트 ÷ 2명)',en:'Jayeondo salt bread (set of 4 ÷ 2)',a:6000,b:6000},
+    {g:'shop',ko:'다이소 뷰티 쇼핑',en:'Daiso beauty shopping',a:'shop',b:null}
   ];
   var CG={transit:{ko:'교통',en:'Transport',c:'c-transit'},entry:{ko:'입장·체험',en:'Entry',c:'c-entry'},food:{ko:'식비',en:'Food',c:'c-food'},shop:{ko:'쇼핑',en:'Shopping',c:'c-other'}};
 
   /* ---- time data ---- */
   var SHARED=[
-    {s:'13:00',m:15,g:'move',ko:'명동역 → 케이블카 승강장',en:'Myeongdong → cable car'},
-    {s:'13:15',m:10,g:'move',ko:'케이블카 상행',en:'Cable car up'},
+    {s:'13:00',m:5,g:'move',ko:'명동역 → 남산예장 정류장',en:'Myeongdong → Yejang bus stop'},
+    {s:'13:05',m:20,g:'move',ko:'남산순환버스 상행',en:'Namsan bus up'},
     {s:'13:25',m:65,g:'sight',ko:'N서울타워',en:'N Seoul Tower'},
-    {s:'14:30',m:20,g:'move',ko:'케이블카 하행 · 도보',en:'Cable car down · walk'},
+    {s:'14:30',m:20,g:'move',ko:'01B 하행 · 다이소까지 도보',en:'Bus 01B down · walk to Daiso'},
     {s:'14:50',m:40,g:'shop',ko:'다이소 명동역점',en:'Daiso Myeongdong'},
     {s:'15:30',m:30,g:'move',ko:'명동역 → 성수역',en:'Myeongdong → Seongsu'},
     {s:'16:00',m:15,g:'meal',ko:'자연도소금빵',en:'Jayeondo salt bread'},
@@ -513,17 +503,18 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
   var DIST=[
     {who:'A',g:'subway',km:17.0,ko:'신림역 → 명동역',en:'Sillim → Myeongdong'},
     {who:'B',g:'subway',km:46.0,ko:'수원시청역 → 명동역',en:'Suwon City Hall → Myeongdong'},
-    {who:'X',g:'walk',km:0.8,ko:'명동역 → 케이블카',en:'Myeongdong → cable car'},
-    {who:'X',g:'cable',km:1.2,ko:'케이블카 왕복',en:'Cable car round trip'},
+    {who:'X',g:'walk',km:0.3,ko:'명동역 → 남산예장 정류장',en:'Myeongdong → Yejang bus stop'},
+    {who:'X',g:'cable',km:5.0,ko:'남산순환버스 상행',en:'Namsan bus up'},
+    {who:'X',g:'cable',km:4.0,ko:'남산순환버스 하행 (01B)',en:'Namsan bus down (01B)'},
     {who:'X',g:'walk',km:1.0,ko:'타워 광장 산책',en:'Tower plaza walk'},
-    {who:'X',g:'walk',km:0.9,ko:'케이블카 → 다이소',en:'Cable car → Daiso'},
+    {who:'X',g:'walk',km:0.4,ko:'남산예장 → 다이소',en:'Yejang stop → Daiso'},
     {who:'X',g:'walk',km:0.5,ko:'다이소 매장 안',en:'Inside Daiso'},
     {who:'X',g:'subway',km:8.0,ko:'명동역 → 성수역',en:'Myeongdong → Seongsu'},
     {who:'X',g:'walk',km:1.5,ko:'성수 골목 산책',en:'Seongsu walk'},
     {who:'A',g:'subway',km:27.0,ko:'성수역 → 신림역',en:'Seongsu → Sillim'},
     {who:'B',g:'subway',km:54.0,ko:'성수역 → 수원역',en:'Seongsu → Suwon Stn'}
   ];
-  var DG={walk:{ko:'도보',en:'Walking',c:'c-walk'},subway:{ko:'지하철',en:'Subway',c:'c-subway'},cable:{ko:'케이블카',en:'Cable car',c:'c-bus'}};
+  var DG={walk:{ko:'도보',en:'Walking',c:'c-walk'},subway:{ko:'지하철',en:'Subway',c:'c-subway'},cable:{ko:'버스',en:'Bus',c:'c-bus'}};
 
   /* ---- helpers ---- */
   function T(o){return o[lang]}
@@ -532,17 +523,23 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
   function toMin(s){var p=s.split(':');return +p[0]*60+ +p[1]}
   function fmt(t){var h=Math.floor(t/60),m=t%60;return (h<10?'0':'')+h+':'+(m<10?'0':'')+m}
   function km(n){return n.toFixed(1)+' km'}
-  function val(x){return x.shop?shop:x.v}
+  function v(x,t){var r=x[t];return r==='shop'?shop:r}
   function on(x){return !(x.flag==='obs'&&!obs)&&!(x.flag==='lock'&&!lock)}
-  function perPerson(team){var t=0;COST.forEach(function(x){if(!on(x)||x.who==='G')return;if(x.who==='X'||x.who===team)t+=val(x)});var n=team==='A'?nA:nB;if(lock&&n>0)t+=10000/n;return t}
-  function lineTotal(x){if(!on(x))return 0;if(x.who==='G')return x.v*((nA>0?1:0)+(nB>0?1:0));var n=x.who==='A'?nA:x.who==='B'?nB:nA+nB;return val(x)*n}
-  function whoLabel(w){return w==='A'?(lang==='ko'?'신림 팀':'Sillim'):w==='B'?(lang==='ko'?'수원 팀':'Suwon'):w==='G'?(lang==='ko'?'팀당':'per group'):(lang==='ko'?'모두':'everyone')}
+  function perPerson(t){var s=0;COST.forEach(function(x){if(on(x)&&v(x,t)!=null)s+=v(x,t)});return s}
+  function cell(n){return n==null?'<td class="n na">–</td>':'<td class="n">'+won(n)+'</td>'}
 
   document.querySelectorAll('.maps').forEach(function(el){
     var q=encodeURIComponent(el.getAttribute('data-q'));
-    el.innerHTML='<a class="nv" href="https://map.naver.com/p/search/'+q+'" target="_blank" rel="noopener"><i></i>Naver Map ↗</a>'+
+    var card=el.closest('[data-pin]'),pin=el.getAttribute('data-pin')||(card&&card.getAttribute('data-pin'));
+    el.innerHTML=(pin?'<button type="button" class="showmap" data-goto="'+pin+'"><span class="ko">📍 지도에서 보기</span><span class="en">📍 Show on map</span></button>':'')+
+                 '<a class="nv" href="https://map.naver.com/p/search/'+q+'" target="_blank" rel="noopener"><i></i>Naver Map ↗</a>'+
                  '<a class="kk" href="https://map.kakao.com/link/search/'+q+'" target="_blank" rel="noopener"><i></i>Kakao Map ↗</a>';
   });
+  document.querySelectorAll('.card[data-pin]').forEach(function(c){
+    c.querySelectorAll('h3').forEach(function(h){h.classList.add('golink');h.setAttribute('role','button');h.setAttribute('tabindex','0');h.setAttribute('data-goto',c.getAttribute('data-pin'))});
+  });
+  document.addEventListener('click',function(e){if(e.target.closest('a'))return;var t=e.target.closest('[data-goto]');if(t){e.preventDefault();focusPin(t.getAttribute('data-goto'),t.tagName==='LI')}});
+  document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.matches('h3[data-goto]')){e.preventDefault();focusPin(e.target.getAttribute('data-goto'))}});
 
   function drawTrack(trackId,tickId,rows,start,end){
     var span=end-start,tr=document.getElementById(trackId);tr.innerHTML='';
@@ -552,25 +549,25 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
   }
 
   function render(){
-    // cost
-    var pa=perPerson('A'),pb=perPerson('B'),tot=pa*nA+pb*nB;
-    document.getElementById('cost-total').textContent=won(tot);
-    document.getElementById('cost-per').textContent=lang==='ko'?('신림 팀 '+nA+'명 + 수원 팀 '+nB+'명'):('Sillim '+nA+' + Suwon '+nB+' people');
+    // cost (per person, by group)
+    var pa=perPerson('a'),pb=perPerson('b');
     document.getElementById('per-a').textContent=won(pa);document.getElementById('per-b').textContent=won(pb);
-    document.getElementById('tab-cost').textContent=won(tot);
-    document.getElementById('an').textContent=nA;document.getElementById('bn').textContent=nB;
-    var cs={};COST.forEach(function(x){cs[x.g]=(cs[x.g]||0)+lineTotal(x)});
-    var bar=document.getElementById('cost-bar'),lg=document.getElementById('cost-legend');bar.innerHTML='';lg.innerHTML='';
-    Object.keys(CG).forEach(function(k){var v=cs[k]||0;if(!v)return;var s=document.createElement('span');s.className=CG[k].c;s.style.width=(v/tot*100)+'%';bar.appendChild(s);
-      var l=document.createElement('span');l.innerHTML='<i class="'+CG[k].c+'"></i>'+T(CG[k])+' · '+won(v);lg.appendChild(l)});
-    var h='<tr><th>'+(lang==='ko'?'항목':'Item')+'</th><th class="n">'+(lang==='ko'?'단가':'Each')+'</th><th class="n">'+(lang==='ko'?'합계':'Total')+'</th></tr>';
+    document.getElementById('tab-cost').textContent='₩'+Math.round(pa/1000)+'k/'+Math.round(pb/1000)+'k';
+    ['a','b'].forEach(function(t){
+      var tot=t==='a'?pa:pb,bar=document.getElementById('bar-'+t);bar.innerHTML='';
+      Object.keys(CG).forEach(function(k){var sum=0;COST.forEach(function(x){if(x.g===k&&on(x)&&v(x,t)!=null)sum+=v(x,t)});if(!sum)return;
+        var e=document.createElement('span');e.className=CG[k].c;e.style.width=(sum/tot*100)+'%';e.title=T(CG[k])+' '+won(sum);bar.appendChild(e)});
+    });
+    var lg=document.getElementById('cost-legend');lg.innerHTML='';
+    Object.keys(CG).forEach(function(k){var l=document.createElement('span');l.innerHTML='<i class="'+CG[k].c+'"></i>'+T(CG[k]);lg.appendChild(l)});
+    var h='<tr><th>'+(lang==='ko'?'항목':'Item')+'</th><th class="n th-a">'+(lang==='ko'?'신림 팀<br>(1인)':'Sillim<br>(1 person)')+'</th><th class="n th-b">'+(lang==='ko'?'수원 팀<br>(1인)':'Suwon<br>(1 person)')+'</th></tr>';
     Object.keys(CG).forEach(function(g){
       var rows=COST.filter(function(x){return x.g===g&&on(x)});if(!rows.length)return;
-      h+='<tr class="grp"><td colspan="2"><span class="dot '+CG[g].c+'"></span>'+T(CG[g])+'</td><td class="n">'+won(cs[g])+'</td></tr>';
-      rows.forEach(function(x){var n=x.who==='A'?nA:x.who==='B'?nB:x.who==='G'?((nA>0?1:0)+(nB>0?1:0)):nA+nB;
-        h+='<tr><td>'+T(x)+'<small>'+whoLabel(x.who)+' × '+n+'</small></td><td class="n">'+won(val(x))+'</td><td class="n">'+won(lineTotal(x))+'</td></tr>'});
+      var sa=0,sb=0;rows.forEach(function(x){if(v(x,'a')!=null)sa+=v(x,'a');if(v(x,'b')!=null)sb+=v(x,'b')});
+      h+='<tr class="grp"><td><span class="dot '+CG[g].c+'"></span>'+T(CG[g])+'</td>'+cell(sa||null)+cell(sb||null)+'</tr>';
+      rows.forEach(function(x){h+='<tr><td>'+T(x)+'</td>'+cell(v(x,'a'))+cell(v(x,'b'))+'</tr>'});
     });
-    h+='<tr class="sum"><td>'+(lang==='ko'?'합계':'Total')+'</td><td></td><td class="n">'+won(tot)+'</td></tr>';
+    h+='<tr class="sum"><td>'+(lang==='ko'?'1인 합계':'Per person')+'</td><td class="n">'+won(pa)+'</td><td class="n">'+won(pb)+'</td></tr>';
     document.getElementById('cost-table').innerHTML=h;
 
     // time
@@ -616,7 +613,7 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
   var KAKAO_KEY='856809adc99a02532a20ffdd68acdf22';
   var PINS=[
     {r:'N',n:'M',lat:37.5609,lng:126.9863,t:'13:00',ko:'명동역 3번 출구 (만나는 곳)',en:'Myeongdong Stn Exit 3 (meet here)',q:'명동역 3번출구',meet:true},
-    {r:'N',n:'1',lat:37.5578,lng:126.9827,t:'13:15',ko:'남산 케이블카 승강장',en:'Namsan Cable Car station',q:'남산케이블카'},
+    {r:'N',n:'1',lat:37.5592,lng:126.9890,t:'13:05',ko:'남산예장 버스 정류장 (01A·01B)',en:'Namsan Yejang bus stop (01A/01B)',q:'남산예장버스환승주차장'},
     {r:'N',n:'2',lat:37.5512,lng:126.9882,t:'13:25',ko:'N서울타워',en:'N Seoul Tower',q:'N서울타워'},
     {r:'N',n:'3',lat:37.5602,lng:126.9853,t:'14:50',ko:'다이소 명동역점',en:'Daiso Myeongdong Stn',q:'다이소 명동역점'},
     {r:'S',n:'S',lat:37.5446,lng:127.0557,t:'16:00',ko:'성수역',en:'Seongsu Stn',q:'성수역',stn:true},
@@ -628,7 +625,7 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
   var ROUTE_B=[[37.2617,127.0315],[37.2664,126.9999],[37.3722,126.9435],[37.4019,126.9227],[37.4810,126.8828],[37.5156,126.9073],[37.5299,126.9648],[37.5547,126.9707],[37.5585,126.9781],[37.5609,126.9863]];
   var ROUTE_X=[[37.5609,126.9863],[37.5612,126.9945],[37.5654,127.0079],[37.5658,127.0174],[37.5649,127.0294],[37.5612,127.0371],[37.5554,127.0436],[37.5476,127.0474],[37.5446,127.0557]];
   var STN=[['신림','Sillim',37.4842,126.9297,'A'],['사당','Sadang',37.4766,126.9816,'A'],['수원시청','Suwon City Hall',37.2617,127.0315,'B'],['수원','Suwon',37.2664,126.9999,'B'],['서울역','Seoul Stn',37.5547,126.9707,'B'],['명동','Myeongdong',37.5609,126.9863,'X'],['성수','Seongsu',37.5446,127.0557,'X']];
-  var region='N', kmap=null, kState='idle';
+  var region='N', kmap=null, kState='idle', sel=null, kInfo={}, openInfo=null;
 
   function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
   function pinColor(p){return p.meet?css('--fg'):p.stn?css('--slate'):(p.r==='N'?css('--celadon'):css('--brick'))}
@@ -664,9 +661,13 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
       var order=r==='N'?['M','1','2','1','3']:['S','4','6','5','S'];
       o+='<polyline points="'+order.map(function(n){var p=ps.filter(function(q){return q.n===n})[0];return X(p.lng).toFixed(1)+','+Y(p.lat).toFixed(1)}).join(' ')+'" fill="none" stroke="'+fg+'" stroke-opacity=".5" stroke-width="2" stroke-dasharray="5 4"/>';
       ps.forEach(function(p){var x=X(p.lng),y=Y(p.lat);
-        o+='<circle cx="'+x+'" cy="'+y+'" r="11" fill="'+pinColor(p)+'" stroke="'+sf+'" stroke-width="2.5"/>';
+        if(p.n===sel){o+='<circle cx="'+x+'" cy="'+y+'" r="19" fill="none" stroke="'+pinColor(p)+'" stroke-width="3" opacity=".45"/>';}
+        o+='<circle cx="'+x+'" cy="'+y+'" r="'+(p.n===sel?14:11)+'" fill="'+pinColor(p)+'" stroke="'+sf+'" stroke-width="2.5"/>';
         o+='<text x="'+x+'" y="'+(y+4)+'" font-size="11" font-weight="700" fill="'+sf+'" text-anchor="middle" font-family="IBM Plex Mono,monospace">'+(p.stn?'🚇':p.n)+'</text>';
       });
+      var sp=ps.filter(function(p){return p.n===sel})[0];
+      if(sp){var sx=X(sp.lng),sy=Y(sp.lat),lbl=sp.t+' '+T(sp),wd=lbl.length*(lang==='ko'?11.5:6.6)+16,bx=Math.max(6,Math.min(W-wd-6,sx-wd/2)),by=sy-46<6?sy+24:sy-46;
+        o+='<rect x="'+bx+'" y="'+by+'" width="'+wd+'" height="24" rx="6" fill="'+fg+'"/><text x="'+(bx+wd/2)+'" y="'+(by+16)+'" font-size="12" font-weight="700" fill="'+sf+'" text-anchor="middle">'+lbl+'</text>';}
       var m=r==='S'?0.2:0.5,px=(m/111.32)*s;
       o+='<line x1="16" y1="'+(H-16)+'" x2="'+(16+px)+'" y2="'+(H-16)+'" stroke="'+fg+'" stroke-width="2"/><text x="16" y="'+(H-22)+'" font-size="10" fill="'+mu+'">'+(m*1000)+' m</text>';
     }
@@ -677,7 +678,7 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
     var h='';
     PINS.filter(function(p){return region==='A'||p.r===region}).forEach(function(p){
       var q=encodeURIComponent(p.q),cls=p.meet?'M':p.stn?'T':(p.r==='N'?'W':'S');
-      h+='<li><span class="num '+cls+'">'+(p.stn?'🚇':p.n)+'</span><span style="min-width:0"><span class="t">'+p.t+'</span> '+T(p)+'</span>'+
+      h+='<li data-goto="'+p.n+'" class="'+(p.n===sel?'on':'')+'"><span class="num '+cls+'">'+(p.stn?'🚇':p.n)+'</span><span style="min-width:0"><span class="t">'+p.t+'</span> '+T(p)+'</span>'+
          '<span class="lk"><a href="https://map.naver.com/p/search/'+q+'" target="_blank" rel="noopener">N</a><a href="https://map.kakao.com/link/search/'+q+'" target="_blank" rel="noopener">K</a></span></li>';
     });
     document.getElementById('pinlist').innerHTML=h;
@@ -711,7 +712,8 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
     pl(ROUTE_A,css('--team-a'));pl(ROUTE_B,css('--team-b'));pl(ROUTE_X,css('--together'));
     PINS.forEach(function(p){
       var d=document.createElement('div');d.className='kpin';d.style.background=pinColor(p);d.textContent=p.stn?'🚇':p.n;d.title=T(p);
-      d.addEventListener('click',function(){new km.InfoWindow({position:new km.LatLng(p.lat,p.lng),content:'<div style="padding:6px 10px;font-size:13px;color:#222;white-space:nowrap">'+p.t+' '+T(p)+'</div>',removable:true}).open(kmap)});
+      kInfo[p.n]=new km.InfoWindow({position:new km.LatLng(p.lat,p.lng),content:'<div style="padding:6px 10px;font-size:13px;color:#222;white-space:nowrap">'+p.t+' '+T(p)+'</div>',removable:true});
+      d.addEventListener('click',function(e){e.stopPropagation();focusPin(p.n,true)});
       new km.CustomOverlay({map:kmap,position:new km.LatLng(p.lat,p.lng),content:d,yAnchor:.5});
     });
   }
@@ -719,14 +721,25 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
     var km=window.kakao.maps,b=new km.LatLngBounds();
     var pts=region==='A'?ROUTE_A.concat(ROUTE_B,ROUTE_X):PINS.filter(function(p){return p.r===region}).map(function(p){return [p.lat,p.lng]});
     pts.forEach(function(p){b.extend(new km.LatLng(p[0],p[1]))});
-    kmap.relayout();kmap.setBounds(b,40,40,40,40);
+    kmap.relayout();
+    if(openInfo){openInfo.close();openInfo=null}
+    var sp=PINS.filter(function(p){return p.n===sel})[0];
+    if(sp&&sp.r===region){kmap.setLevel(region==='S'?2:4);kmap.setCenter(new km.LatLng(sp.lat,sp.lng));openInfo=kInfo[sp.n];openInfo.open(kmap)}
+    else kmap.setBounds(b,40,40,40,40);
+  }
+  function focusPin(n,stay){
+    var p=PINS.filter(function(q){return q.n===n})[0];if(!p)return;
+    sel=n;region=p.r;
+    if(document.getElementById('mapview').hidden)setView('map');else renderMap();
+    if(!stay){var mv=document.getElementById('mapview');var rm=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      try{mv.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'})}catch(e){mv.scrollIntoView()}}
   }
   var vl=document.getElementById('v-list'),vm=document.getElementById('v-map');
   function setView(v){var map=v==='map';vl.setAttribute('aria-pressed',!map);vm.setAttribute('aria-pressed',map);
     document.getElementById('listview').hidden=map;document.getElementById('mapview').hidden=!map;
     if(map){loadKakao();renderMap()} try{localStorage.setItem('view',v)}catch(e){}}
   vl.addEventListener('click',function(){setView('list')});vm.addEventListener('click',function(){setView('map')});
-  document.querySelectorAll('.regions button').forEach(function(b){b.addEventListener('click',function(){region=b.getAttribute('data-r');renderMap()})});
+  document.querySelectorAll('.regions button').forEach(function(b){b.addEventListener('click',function(){region=b.getAttribute('data-r');sel=null;renderMap()})});
 
   /* ---- tabs & controls ---- */
   var tabs=[].slice.call(document.querySelectorAll('[role=tab]'));
@@ -736,10 +749,6 @@ footer{margin-top:18px;font-size:12px;color:var(--muted)}
   var bko=document.getElementById('btn-ko'),ben=document.getElementById('btn-en');
   function setLang(l){lang=l;app.setAttribute('data-lang',l);document.documentElement.lang=l;bko.setAttribute('aria-pressed',l==='ko');ben.setAttribute('aria-pressed',l==='en');try{localStorage.setItem('lang',l)}catch(e){}render()}
   bko.addEventListener('click',function(){setLang('ko')});ben.addEventListener('click',function(){setLang('en')});
-  document.getElementById('am').addEventListener('click',function(){if(nA>0&&nA+nB>1){nA--;render()}});
-  document.getElementById('ap').addEventListener('click',function(){if(nA<20){nA++;render()}});
-  document.getElementById('bm').addEventListener('click',function(){if(nB>0&&nA+nB>1){nB--;render()}});
-  document.getElementById('bp').addEventListener('click',function(){if(nB<20){nB++;render()}});
   document.getElementById('obs').addEventListener('change',function(e){obs=e.target.checked;render()});
   document.getElementById('lock').addEventListener('change',function(e){lock=e.target.checked;render()});
   document.getElementById('shop').addEventListener('input',function(e){var v=parseInt(e.target.value,10);shop=isNaN(v)||v<0?0:v;render()});
